@@ -1,0 +1,371 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   Radhakundah design tokens
+
+   The logo is navy + orange on white. The system reads those as:
+     navy   → structure, authority, everything typographic
+     orange → one accent, used sparingly so it always means "act here"
+     white  → the page, warmed slightly to a paper tone so long-form
+              research reading is comfortable
+   ═══════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── navy: the primary ── */
+  --color-navy-50: #f2f6fb;
+  --color-navy-100: #e2eaf5;
+  --color-navy-200: #c3d3e9;
+  --color-navy-300: #95b0d3;
+  --color-navy-400: #5f83b4;
+  --color-navy-500: #3a5f95;
+  --color-navy-600: #274a7c;
+  --color-navy-700: #1d3963;
+  --color-navy-800: #142a4a;
+  --color-navy-900: #0d1d35;
+  --color-navy-950: #071223;
+
+  /* ── orange: the accent ── */
+  --color-flame-50: #fff7ed;
+  --color-flame-100: #ffecd6;
+  --color-flame-200: #fed5ab;
+  --color-flame-300: #fdb676;
+  --color-flame-400: #fb8f3f;
+  --color-flame-500: #f2701b;
+  --color-flame-600: #e0570f;
+  --color-flame-700: #b9400f;
+  --color-flame-800: #933414;
+  --color-flame-900: #772d13;
+
+  /* ── warm neutrals: paper, not grey ── */
+  --color-sand-50: #fdfbf7;
+  --color-sand-100: #f8f4ec;
+  --color-sand-200: #efe8db;
+  --color-sand-300: #e0d5c2;
+  --color-sand-400: #c2b49c;
+  --color-sand-500: #9c8d75;
+  --color-sand-600: #7a6c57;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif-display), ui-serif, Georgia, serif;
+
+  --radius-card: 0.875rem;
+
+  --shadow-lift: 0 1px 2px rgb(7 18 35 / 0.04), 0 12px 32px -12px rgb(7 18 35 / 0.16);
+  --shadow-lift-lg: 0 2px 4px rgb(7 18 35 / 0.05), 0 28px 60px -24px rgb(7 18 35 / 0.28);
+
+  --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* ── semantic surface tokens, light then dark ────────────────── */
+
+:root {
+  --surface: var(--color-sand-50);
+  --surface-raised: #ffffff;
+  --surface-sunken: var(--color-sand-100);
+  --surface-inverse: var(--color-navy-900);
+  --border-subtle: var(--color-sand-200);
+  --border-strong: var(--color-sand-300);
+  --text-primary: var(--color-navy-900);
+  --text-secondary: var(--color-navy-600);
+  --text-muted: var(--color-sand-600);
+  --text-on-inverse: var(--color-sand-100);
+  color-scheme: light;
+}
+
+/* Dark is driven by the reader's system setting only — one mechanism, so the
+   semantic tokens below and Tailwind's `dark:` utilities can never disagree. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: var(--color-navy-950);
+    --surface-raised: #0b1a30;
+    --surface-sunken: #050e1c;
+    --surface-inverse: #0b1a30;
+    --border-subtle: #172a45;
+    --border-strong: #22395a;
+    --text-primary: var(--color-sand-100);
+    --text-secondary: var(--color-navy-200);
+    --text-muted: #8ba2c0;
+    --text-on-inverse: var(--color-sand-100);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-line: var(--border-subtle);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text-primary);
+  --color-ink-soft: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+}
+
+/* ── base ────────────────────────────────────────────────────── */
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-flame-200);
+    color: var(--color-navy-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flame-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* ── components ──────────────────────────────────────────────── */
+
+@layer components {
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 80rem;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Small uppercase label above a section heading. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-flame-600);
+  }
+
+  .card {
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    transition:
+      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.35s ease;
+  }
+
+  .card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--border-strong);
+  }
+
+  /* Decorative hairline used under section headings. */
+  .rule-accent::after {
+    content: "";
+    display: block;
+    width: 3rem;
+    height: 2px;
+    margin-top: 0.875rem;
+    background: linear-gradient(90deg, var(--color-flame-500), transparent);
+  }
+}
+
+/* ── long-form rich text (sanitised HTML from the CMS) ───────── */
+
+.prose-content {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+.prose-content > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-content h2,
+.prose-content h3,
+.prose-content h4 {
+  margin-top: 2.25em;
+  margin-bottom: -0.35em;
+  line-height: 1.25;
+  scroll-margin-top: 6rem;
+}
+
+.prose-content h2 {
+  font-size: 1.6rem;
+}
+.prose-content h3 {
+  font-size: 1.3rem;
+}
+.prose-content h4 {
+  font-size: 1.1rem;
+}
+
+.prose-content a {
+  color: var(--color-flame-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-flame-300);
+}
+
+.prose-content a:hover {
+  text-decoration-color: var(--color-flame-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose-content a {
+    color: var(--color-flame-300);
+  }
+}
+
+.prose-content strong {
+  font-weight: 650;
+}
+
+.prose-content ul,
+.prose-content ol {
+  padding-left: 1.5rem;
+}
+
+.prose-content ul {
+  list-style: disc;
+}
+.prose-content ol {
+  list-style: decimal;
+}
+.prose-content li::marker {
+  color: var(--color-flame-500);
+}
+.prose-content li + li {
+  margin-top: 0.4em;
+}
+
+.prose-content blockquote {
+  border-left: 3px solid var(--color-flame-400);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  font-family: var(--font-serif);
+  font-size: 1.15em;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.prose-content img {
+  border-radius: var(--radius-card);
+  width: 100%;
+  height: auto;
+}
+
+.prose-content figure figcaption {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.prose-content pre {
+  background: var(--color-navy-900);
+  color: var(--color-sand-100);
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-card);
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.prose-content :not(pre) > code {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  padding: 0.12em 0.4em;
+  border-radius: 0.35rem;
+  font-size: 0.875em;
+}
+
+/* Tables can be wider than the column — let them scroll, never the page. */
+.prose-content .table-scroll,
+.prose-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.prose-content table {
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.prose-content th,
+.prose-content td {
+  border: 1px solid var(--border-subtle);
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.prose-content thead th {
+  background: var(--surface-sunken);
+  font-weight: 600;
+}
+
+.prose-content hr {
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-block: 2.5em;
+}

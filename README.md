@@ -1,2 +1,182 @@
+# Radhakundah — public website
 
-hello
+The Next.js front end for the Radhakundah platform. It renders the public site
+(research, articles, blogs, gallery, videos, about, contact) against the Fastify
+API in `../NikunjaWebBackend`.
+
+**Stack:** Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 ·
+lucide-react. No component library, no state library, no data-fetching library —
+the API is REST and the pages are server components.
+
+---
+
+## Getting started
+
+```bash
+cp .env.example .env.local     # point NEXT_PUBLIC_API_URL at the backend
+npm install
+npm run dev                    # http://localhost:3000
+```
+
+The backend must be running (`npm run dev` in `../NikunjaWebBackend`, on
+`:4000`) with its migrations applied and seed loaded.
+
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm start` | Serve the build |
+| `npm run lint` | ESLint (next/core-web-vitals + typescript) |
+| `npm run typecheck` | `tsc --noEmit` |
+
+### Environment
+
+| Variable | Meaning |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | API origin as the **browser** sees it |
+| `API_INTERNAL_URL` | API origin as the **server** sees it (may be private) |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin; every absolute URL is built from it |
+| `NEXT_PUBLIC_CDN_URL` | Media CDN, added to `next/image` `remotePatterns` |
+| `NEXT_PUBLIC_ENABLE_INDEXING` | `true` **only** on production |
+
+`NEXT_PUBLIC_ENABLE_INDEXING` is the single switch that keeps non-production
+deploys out of the index: anything other than `true` serves `robots.txt` with
+`Disallow: /`, adds an `X-Robots-Tag: noindex` response header, and forces
+`noindex` into every page's metadata.
+
+---
+
+## How it is organised
+
+```
+src/
+├─ app/                      # routes (all server components unless noted)
+│  ├─ layout.tsx             # fonts, sitewide metadata, Organization+WebSite JSON-LD
+│  ├─ page.tsx               # home — one /public/home call feeds every rail
+│  ├─ articles/…             # listing, /category/{slug}, /{slug}
+│  ├─ blogs/…                # same shape; BOTH-placement posts 301 to /articles
+│  ├─ research/…             # listing with category+year filters, detail w/ citation rail
+│  ├─ authors/…  gallery/…  videos/…  tags/[slug]
+│  ├─ about  contact  search  account  auth/callback  newsletter/unsubscribe/[token]
+│  ├─ robots.ts  manifest.ts  not-found.tsx  error.tsx
+├─ components/
+│  ├─ providers/AuthProvider.tsx   "use client" — in-memory access token
+│  ├─ site/                        Header, Footer, Logo, NewsletterForm
+│  ├─ cards/                       Post, Research, Video, Gallery, Author cards
+│  ├─ listing/                     ListingShell, PostListingView
+│  ├─ post/                        PostArticle, Engagement, ShareRow, ViewCounter
+│  ├─ research/PaperAccess.tsx     gated PDF reader
+│  ├─ gallery/GalleryGrid.tsx      grid + lightbox
+│  ├─ video/YouTubeEmbed.tsx       click-to-load facade
+│  └─ ui/                          primitives, CoverImage
+└─ lib/                      api.ts · types.ts · seo.ts · format.ts · navigation.ts
+```
+
+Client components are only where interaction genuinely lives: the header, the
+hero carousel, the lightbox, the video facade, likes/comments, the PDF reader,
+and the two forms. **Nothing that must be indexed is fetched in the browser.**
+
+---
+
+## SEO
+
+The backend is the source of SEO truth. Detail endpoints return a resolved `seo`
+block — title, description, canonical, robots, Open Graph, Twitter, and JSON-LD
+with every fallback already applied. `metadataFromSeo()` in `lib/seo.ts`
+translates it into Next `Metadata` verbatim and invents nothing.
+
+What this app is responsible for:
+
+- **One request per page.** `generateMetadata()` and the page body call the same
+  function, deduped by React `cache()`.
+- **Canonicals.** Every page emits an absolute canonical. Paginated listings
+  self-canonicalise to `?page=n` and emit `rel=prev`/`rel=next`.
+- **Real 404s.** A missing slug asks the redirect table first
+  (`lib/navigation.ts`), 301s if there is a rule, and otherwise calls
+  `notFound()` — a genuine 404 status, never a soft 200.
+  *There is deliberately no root `loading.tsx`: a root-level loading boundary
+  starts streaming before the status is known and silently turns every 404 into
+  a 200.*
+- **One URL per post.** `BOTH`-placement posts are canonical at
+  `/articles/{slug}`; `/blogs/{slug}` permanently redirects. A `BLOG` post
+  reached under `/articles/` redirects the other way.
+- **Thin content stays out.** Category and tag pages with fewer than three items
+  are `noindex`, as are search results, the member account page, and preview.
+- **Structured data.** `Organization` + `WebSite` (with `SearchAction`) sitewide;
+  `Article`/`ScholarlyArticle`/`VideoObject`/`ImageGallery`/`Person` and
+  `BreadcrumbList` per page, all built server-side by the API.
+- **Sitemaps** are generated by the backend and proxied through
+  `next.config.mjs` rewrites so they serve from the canonical domain:
+  `/sitemap.xml`, `/sitemaps/*`.
+
+### Caching
+
+| Content | `revalidate` |
+| --- | --- |
+| Listings, home | 60s |
+| Detail pages | 300s |
+| About, settings, taxonomies | 3600s |
+| Search, member reads | never cached |
+
+Dynamic routes pre-render their newest ~50 entries via `generateStaticParams()`
+and serve the long tail on demand (`dynamicParams = true`).
+
+---
+
+## Authentication
+
+Google OAuth only — there are no passwords anywhere in this system.
+
+1. `signIn()` sends the browser to `{API}/api/v1/auth/google`.
+2. After consent the API sets the httpOnly refresh cookie and redirects to
+   `/auth/callback`.
+3. That page strips the URL and lets `AuthProvider` exchange the cookie for an
+   access token.
+
+The access token is held **in memory only** — never `localStorage`, never a
+readable cookie — and is re-minted a minute before its 15-minute expiry. Signed
+out visitors can read the entire public site; signing in only adds liking,
+commenting, and full-text access to papers.
+
+### Gated papers
+
+Research PDFs live in a private bucket. `PaperAccess` exchanges a signed-in
+session for a 60-second presigned URL and renders it inline with the viewer
+toolbar suppressed and the context menu disabled; the backend logs every access
+against the reader. As agreed in the spec, this deters casual downloading — it
+is not a technical guarantee, because anything a browser renders can be
+captured.
+
+---
+
+## Design
+
+The logo's navy and orange drive the whole system, defined as tokens in
+`app/globals.css`:
+
+- **Navy** (`--color-navy-*`) carries structure and typography.
+- **Orange** (`--color-flame-*`) is the single accent — used sparingly enough
+  that it always means "act here".
+- **Warm neutrals** (`--color-sand-*`) make the page read as paper rather than
+  grey, which matters for long-form research reading.
+
+Semantic tokens (`--color-surface`, `--color-ink`, `--color-line`, …) sit on top
+and flip under `prefers-color-scheme: dark`. Dark mode is driven by the system
+setting alone, so the tokens and Tailwind's `dark:` utilities can never
+disagree. Typography is Source Serif 4 for headings and long-form, Inter for UI.
+
+CMS rich text is styled by `.prose-content` (hand-written, no typography
+plugin), including tables that scroll inside their own container so the page
+body never scrolls sideways.
+
+---
+
+## Known gap
+
+**Draft preview is not wired.** The spec calls for
+`/api/preview?token=…` → `draftMode()`. The backend mints preview tokens
+(`POST /admin/posts/:id/preview-token`) and `seoService.verifyPreviewToken()`
+exists, but **no route exposes verification**, so the frontend has no way to
+validate a token. Once the backend adds something like
+`POST /public/preview/verify`, the route handler and the `draftMode()` branch in
+the detail pages are a small addition. Nothing here fakes it in the meantime.
