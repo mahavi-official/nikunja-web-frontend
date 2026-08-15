@@ -140,25 +140,31 @@ function Sidebar({ viewer, onNavigate }: { viewer: Viewer; onNavigate?: () => vo
     item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
   return (
-    <div className="flex h-full flex-col bg-navy-950 text-navy-100">
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-white/10 px-5">
-        <LogoMark className="size-8" />
-        <span className="flex flex-col leading-none">
+    <div className="flex h-full flex-col border-r border-white/10 bg-navy-950 text-navy-100">
+      {/* `px-6` here against the nav's `px-3` + each row's own `px-3`: the
+          logo, every icon and the group labels all start on the same 24px
+          line down the rail. Change one of the three and you break it. */}
+      <div className="mandala-field relative flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b border-white/10 px-6">
+        <LogoMark className="relative size-8 shrink-0" />
+        <span className="relative flex min-w-0 flex-col leading-none">
           <span className="font-display text-lg font-semibold text-white">Radhakundah</span>
-          <span className="mt-0.5 text-[0.5625rem] font-semibold tracking-[0.2em] text-flame-400 uppercase">
+          <span className="mt-1 text-[0.5625rem] font-semibold tracking-[0.2em] text-flame-400 uppercase">
             Content studio
           </span>
         </span>
       </div>
 
-      <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">
+      <nav
+        aria-label="Admin"
+        className="scrollbar-on-dark flex-1 overflow-y-auto overscroll-contain px-3 py-5"
+      >
         {NAV.map((group) => {
           const items = group.items.filter((item) => item.guard(viewer));
           if (!items.length) return null;
 
           return (
-            <div key={group.title} className="mb-5">
-              <h2 className="px-3 pb-2 text-[0.625rem] font-semibold tracking-[0.16em] text-navy-400 uppercase">
+            <div key={group.title} className="mb-6 last:mb-0">
+              <h2 className="px-3 pb-1.5 text-[0.625rem] font-semibold tracking-[0.16em] text-navy-300/80 uppercase">
                 {group.title}
               </h2>
               <ul className="space-y-0.5">
@@ -171,14 +177,27 @@ function Sidebar({ viewer, onNavigate }: { viewer: Viewer; onNavigate?: () => vo
                         onClick={onNavigate}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          "group relative flex items-center gap-3 px-3 py-2 text-sm transition-colors duration-150",
                           active
-                            ? "bg-flame-500 text-white"
-                            : "text-navy-200 hover:bg-white/10 hover:text-white"
+                            ? "bg-white/[0.07] font-semibold text-white"
+                            : "font-medium text-navy-200 hover:bg-white/[0.04] hover:text-white"
                         )}
                       >
-                        <item.Icon className="size-4 shrink-0" aria-hidden />
-                        {item.label}
+                        {/* Saffron marks where you are, but as a rule and an
+                            icon rather than a filled block — a solid accent
+                            block is what the one committing button on a screen
+                            gets, and two of those compete. */}
+                        {active ? (
+                          <span className="absolute inset-y-0 left-0 w-[2px] bg-flame-400" aria-hidden />
+                        ) : null}
+                        <item.Icon
+                          className={cn(
+                            "size-4 shrink-0 transition-colors",
+                            active ? "text-flame-400" : "text-navy-300 group-hover:text-navy-100"
+                          )}
+                          aria-hidden
+                        />
+                        <span className="truncate">{item.label}</span>
                       </Link>
                     </li>
                   );
@@ -189,12 +208,16 @@ function Sidebar({ viewer, onNavigate }: { viewer: Viewer; onNavigate?: () => vo
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-white/10 p-3">
+      <div className="shrink-0 border-t border-white/10 px-3 py-3">
         <Link
           href="/"
-          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-navy-200 transition-colors hover:bg-white/10 hover:text-white"
+          onClick={onNavigate}
+          className="group flex items-center gap-3 px-3 py-2 text-sm font-medium text-navy-200 transition-colors hover:bg-white/[0.06] hover:text-white"
         >
-          <ArrowUpRight className="size-4 shrink-0" aria-hidden />
+          <ArrowUpRight
+            className="size-4 shrink-0 text-navy-300 transition-colors group-hover:text-flame-400"
+            aria-hidden
+          />
           View the site
         </Link>
       </div>
@@ -281,21 +304,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Sidebar viewer={viewer} />
             </aside>
 
-            {/* Slide-over on small screens. */}
+            {/* Slide-over on small screens. `inert` while closed, so the whole
+                rail is out of the tab order rather than merely invisible —
+                otherwise tabbing from the header walks into a hidden menu. */}
             <div
               className={cn("fixed inset-0 z-50 lg:hidden", menuOpen ? "" : "pointer-events-none")}
               aria-hidden={!menuOpen}
+              inert={!menuOpen}
             >
               <div
                 onClick={() => setMenuOpen(false)}
                 className={cn(
-                  "absolute inset-0 bg-navy-950/50 transition-opacity duration-300",
+                  "absolute inset-0 bg-navy-950/55 transition-opacity duration-300",
                   menuOpen ? "opacity-100" : "opacity-0"
                 )}
               />
               <div
                 className={cn(
-                  "absolute inset-y-0 left-0 w-72 transition-transform duration-300 ease-out",
+                  "absolute inset-y-0 left-0 w-72 max-w-[85%] shadow-2xl transition-transform duration-300 ease-out",
                   menuOpen ? "translate-x-0" : "-translate-x-full"
                 )}
               >
@@ -304,36 +330,47 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="lg:pl-64">
-              <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-line bg-surface/85 px-4 backdrop-blur-xl md:px-8">
-                <button
-                  type="button"
-                  onClick={() => setMenuOpen(true)}
-                  aria-label="Open menu"
-                  className="grid size-10 place-items-center rounded-lg text-ink transition-colors hover:bg-surface-sunken lg:hidden"
-                >
-                  <Menu className="size-5" />
-                </button>
-
-                <div className="hidden min-w-0 lg:block" />
-
-                <div className="flex min-w-0 items-center gap-3">
-                  <ThemeToggle className="rounded-lg" />
-
-                  <div className="hidden min-w-0 text-right sm:block">
-                    <p className="truncate text-[0.8125rem] font-medium text-ink">{user?.name}</p>
-                    <p className="truncate text-[0.6875rem] text-ink-muted">{user?.email}</p>
-                  </div>
-                  <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-800 text-[0.8125rem] font-semibold text-white">
-                    {user?.name?.[0]?.toUpperCase() ?? "?"}
-                  </span>
+              {/* The bar spans the column so its rule meets the rail, but its
+                  contents ride the same 6xl measure as the page below — the
+                  avatar and the right edge of a panel land on one line. */}
+              <header className="sticky top-0 z-30 border-b border-line bg-surface px-4 md:px-8">
+                <div className="mx-auto flex h-16 max-w-6xl items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => signOut()}
-                    aria-label="Sign out"
-                    className="grid size-9 place-items-center rounded-lg text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                    onClick={() => setMenuOpen(true)}
+                    aria-label="Open menu"
+                    // Pulled left by half its padding so the glyph, not the hit
+                    // area, sits on the content edge.
+                    className="-ml-2 grid size-10 shrink-0 place-items-center text-ink transition-colors hover:text-flame-700 lg:hidden"
                   >
-                    <LogOut className="size-4" />
+                    <Menu className="size-5" />
                   </button>
+
+                  <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
+                    <ThemeToggle />
+
+                    <span className="hidden h-6 w-px shrink-0 bg-line sm:block" aria-hidden />
+
+                    <div className="hidden min-w-0 text-right sm:block">
+                      <p className="truncate text-[0.8125rem] leading-tight font-medium text-ink">
+                        {user?.name}
+                      </p>
+                      <p className="truncate text-[0.6875rem] leading-tight text-ink-muted">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-[2px] bg-navy-800 text-[0.8125rem] font-semibold text-white select-none dark:bg-navy-700">
+                      {user?.name?.[0]?.toUpperCase() ?? "?"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => signOut()}
+                      aria-label="Sign out"
+                      className="grid size-9 shrink-0 place-items-center text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <LogOut className="size-4" />
+                    </button>
+                  </div>
                 </div>
               </header>
 
@@ -360,7 +397,7 @@ export function RequirePermission({
 
   if (!user || !allow(user)) {
     return (
-      <div className="rounded-2xl border border-dashed border-line-strong px-6 py-20 text-center">
+      <div className="border-y border-line-strong px-6 py-20 text-center">
         <ShieldCheck className="mx-auto size-8 text-ink-muted" aria-hidden />
         <h2 className="mt-4 text-lg font-semibold text-ink">Not available to your role</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted">

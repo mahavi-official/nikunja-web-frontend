@@ -34,7 +34,7 @@ export function ThemeToggle({
         onClick={toggleTheme}
         aria-pressed={dark}
         className={cn(
-          "flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3.5 text-base font-medium text-ink-soft transition-colors hover:bg-surface-sunken",
+          "flex w-full items-center justify-between gap-3 py-3.5 text-base text-ink-soft transition-colors hover:text-ink",
           className
         )}
       >
@@ -68,7 +68,7 @@ export function ThemeToggle({
       aria-pressed={dark}
       title={label}
       className={cn(
-        "grid size-10 place-items-center rounded-full text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink",
+        "grid size-9 place-items-center text-ink-soft transition-colors hover:text-ink",
         className
       )}
     >

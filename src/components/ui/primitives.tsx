@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { absoluteUrl } from "@/lib/seo";
 import { cn } from "@/lib/format";
 
@@ -8,23 +7,26 @@ import { cn } from "@/lib/format";
 type Variant = "primary" | "secondary" | "ghost" | "inverse";
 type Size = "sm" | "md" | "lg";
 
+/**
+ * Buttons are set, not styled: a square edge, no glow, no gradient, and the
+ * saffron spent only on the one thing a reader is meant to do. A secondary is
+ * a hairline; a ghost is just text that happens to be clickable.
+ */
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    "bg-flame-500 text-white hover:bg-flame-600 active:bg-flame-700 shadow-[0_6px_18px_-8px] shadow-flame-700/70",
-  secondary:
-    "bg-transparent text-ink border border-line-strong hover:border-navy-400 hover:bg-surface-raised",
-  ghost: "bg-transparent text-ink-soft hover:text-ink hover:bg-surface-sunken",
+  primary: "bg-flame-600 text-white hover:bg-flame-700 active:bg-flame-800",
+  secondary: "bg-transparent text-ink border border-line-strong hover:border-ink",
+  ghost: "bg-transparent text-ink-soft hover:text-ink",
   inverse: "bg-white text-navy-900 hover:bg-sand-100",
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm gap-1.5",
-  md: "h-11 px-5 text-[0.9375rem] gap-2",
-  lg: "h-12 px-6 text-base gap-2",
+  sm: "h-9 px-4 text-[0.8125rem] gap-1.5",
+  md: "h-11 px-6 text-sm gap-2",
+  lg: "h-12 px-8 text-[0.9375rem] gap-2",
 };
 
 const BASE =
-  "inline-flex items-center justify-center rounded-full font-medium transition-colors duration-200 whitespace-nowrap disabled:opacity-55 disabled:pointer-events-none";
+  "inline-flex items-center justify-center rounded-[2px] font-medium tracking-[0.01em] transition-colors duration-200 whitespace-nowrap disabled:opacity-55 disabled:pointer-events-none";
 
 export function buttonClass(variant: Variant = "primary", size: Size = "md", extra?: string) {
   return cn(BASE, VARIANTS[variant], SIZES[size], extra);
@@ -66,15 +68,18 @@ export function Badge({
   className?: string;
 }) {
   const tones = {
-    navy: "bg-navy-50 text-navy-700 dark:bg-navy-800/60 dark:text-navy-100",
-    flame: "bg-flame-50 text-flame-700 dark:bg-flame-900/40 dark:text-flame-200",
-    muted: "bg-surface-sunken text-ink-muted",
+    navy: "text-ink-soft",
+    flame: "text-flame-700 dark:text-flame-300",
+    muted: "text-ink-muted",
   } as const;
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-wider",
+        // A standing label, not a chip: capitals and letterspacing carry it,
+        // so a row of metadata reads as one line of type instead of a row of
+        // coloured pills.
+        "inline-flex items-center text-[0.6875rem] font-semibold uppercase tracking-[0.16em]",
         tones[tone],
         className
       )}
@@ -101,27 +106,41 @@ export function SectionHeading({
   linkLabel?: string;
   align?: "start" | "center";
 }) {
+  /**
+   * A section opens the way a page of a journal opens: the standing head, the
+   * title under it in the display serif, and a rule drawn the full measure —
+   * the rule is what separates the section from what came before, so the
+   * section itself needs no band of colour behind it.
+   */
   return (
-    <div
-      className={cn(
-        "mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between",
-        align === "center" && "md:flex-col md:items-center md:text-center"
-      )}
-    >
-      <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
-        {eyebrow ? <span className="eyebrow">{eyebrow}</span> : null}
-        <h2 className="mt-2 text-2xl md:text-3xl">{title}</h2>
-        {description ? <p className="mt-3 text-ink-soft">{description}</p> : null}
+    <div className={cn("mb-8 md:mb-10", align === "center" && "text-center")}>
+      <div
+        className={cn(
+          "flex flex-wrap items-baseline gap-x-8 gap-y-2 border-b border-line-strong pb-3",
+          align === "center" ? "justify-center" : "justify-between"
+        )}
+      >
+        <div>
+          {eyebrow ? <span className="eyebrow">{eyebrow}</span> : null}
+          <h2 className="mt-1.5 text-3xl md:text-[2.5rem] md:leading-[1.1]">{title}</h2>
+        </div>
+
+        {href ? (
+          <Link href={href} className="link-rule shrink-0 text-sm text-ink-soft">
+            {linkLabel}
+          </Link>
+        ) : null}
       </div>
 
-      {href ? (
-        <Link
-          href={href}
-          className="group inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-navy-600 transition-colors hover:text-flame-600 dark:text-navy-200"
+      {description ? (
+        <p
+          className={cn(
+            "mt-4 max-w-2xl font-serif text-[1.0625rem] leading-relaxed text-ink-soft",
+            align === "center" && "mx-auto"
+          )}
         >
-          {linkLabel}
-          <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+          {description}
+        </p>
       ) : null}
     </div>
   );
@@ -146,7 +165,9 @@ export function Breadcrumbs({ trail }: { trail: { name: string; url: string }[] 
                   <Link href={item.url} className="transition-colors hover:text-flame-600">
                     {item.name}
                   </Link>
-                  <ChevronRight className="size-3.5 opacity-50" aria-hidden />
+                  <span aria-hidden className="opacity-40">
+                    /
+                  </span>
                 </>
               )}
             </li>
@@ -193,10 +214,13 @@ export function EmptyState({
   description?: string;
   action?: { href: string; label: string };
 }) {
+  // Nothing here yet is a note to the reader, not a dashed placeholder box.
   return (
-    <div className="rounded-[var(--radius-card)] border border-dashed border-line-strong bg-surface-raised/60 px-6 py-16 text-center">
-      <h3 className="text-lg text-ink">{title}</h3>
-      {description ? <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted">{description}</p> : null}
+    <div className="border-y border-line px-6 py-20 text-center">
+      <h3 className="text-2xl text-ink">{title}</h3>
+      {description ? (
+        <p className="mx-auto mt-3 max-w-md font-serif text-ink-muted">{description}</p>
+      ) : null}
       {action ? (
         <ButtonLink href={action.href} variant="secondary" size="sm" className="mt-6">
           {action.label}
@@ -245,37 +269,44 @@ export function Pagination({
   }
 
   return (
-    <nav aria-label="Pagination" className="mt-14 flex items-center justify-center gap-1.5">
+    <nav
+      aria-label="Pagination"
+      className="mt-16 flex items-center justify-center gap-5 border-t border-line pt-6"
+    >
       {page > 1 ? (
-        <Link href={href(page - 1)} rel="prev" className={buttonClass("secondary", "sm")}>
+        <Link href={href(page - 1)} rel="prev" className="link-rule text-sm text-ink-soft">
           Previous
         </Link>
       ) : null}
 
-      {window.map((item, index) =>
-        item === "gap" ? (
-          <span key={`gap-${index}`} className="px-1.5 text-ink-muted">
-            …
-          </span>
-        ) : (
-          <Link
-            key={item}
-            href={href(item)}
-            aria-current={item === page ? "page" : undefined}
-            className={cn(
-              "flex size-9 items-center justify-center rounded-full text-sm font-medium transition-colors",
-              item === page
-                ? "bg-navy-800 text-white dark:bg-navy-600"
-                : "text-ink-soft hover:bg-surface-sunken hover:text-ink"
-            )}
-          >
-            {item}
-          </Link>
-        )
-      )}
+      <span className="flex items-center gap-3 text-sm tabular-nums">
+        {window.map((item, index) =>
+          item === "gap" ? (
+            <span key={`gap-${index}`} className="text-ink-muted">
+              …
+            </span>
+          ) : (
+            <Link
+              key={item}
+              href={href(item)}
+              aria-current={item === page ? "page" : undefined}
+              className={cn(
+                "transition-colors",
+                // The current page is the one in ink; the rest are grey. No
+                // filled circle needed to say which one you are on.
+                item === page
+                  ? "font-semibold text-ink underline underline-offset-[0.35em]"
+                  : "text-ink-muted hover:text-flame-700"
+              )}
+            >
+              {item}
+            </Link>
+          )
+        )}
+      </span>
 
       {page < totalPages ? (
-        <Link href={href(page + 1)} rel="next" className={buttonClass("secondary", "sm")}>
+        <Link href={href(page + 1)} rel="next" className="link-rule text-sm text-ink-soft">
           Next
         </Link>
       ) : null}

@@ -75,13 +75,16 @@
   --font-display: var(--font-display-serif), var(--font-serif-display), ui-serif, Georgia, serif;
   --font-devanagari: var(--font-devanagari-serif), var(--font-serif-display), serif;
 
-  --radius-card: 1rem;
+  /* Printed matter has corners. Two pixels is enough to keep an image from
+     looking like it was cut with a blunt knife, and not enough to read as a
+     "card" in the app sense. */
+  --radius-card: 0.125rem;
 
   /* Shadows are blue-tinted, not black — on white, neutral shadows
-     read as dirt, blue reads as air. */
+     read as dirt, blue reads as air. Used now only where something genuinely
+     floats above the page (the mobile sheet), never to lift a list item. */
   --shadow-lift: 0 1px 2px rgb(11 20 48 / 0.04), 0 10px 30px -14px rgb(11 20 48 / 0.18);
   --shadow-lift-lg: 0 2px 6px rgb(11 20 48 / 0.05), 0 30px 60px -28px rgb(11 20 48 / 0.3);
-  --shadow-glow-saffron: 0 10px 34px -12px rgb(226 97 8 / 0.5);
 
   --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-float-slow: float-slow 9s ease-in-out infinite;
@@ -255,6 +258,64 @@
   }
 }
 
+/* ── scrollbars ──────────────────────────────────────────────
+   A native bar is a grey slab from outside the palette; on a warm
+   white page or a nila one it reads as a seam. These are the same
+   neutrals as the borders, drawn thin, on a track that is simply
+   whatever sits underneath — so a scrolling panel still reads as
+   one object. Firefox takes the two standard properties, WebKit
+   the pseudo-elements, with the same values behind both.
+
+   Unlayered on purpose: a scrollbar is chrome, not a utility, and
+   nothing should be able to win against it by specificity. */
+
+:root {
+  --scrollbar-thumb: #ded8cd;
+  --scrollbar-thumb-hover: #bdb4a6;
+}
+
+:root[data-theme="dark"] {
+  --scrollbar-thumb: #223057;
+  --scrollbar-thumb-hover: #35457a;
+}
+
+/* The navy rail is darker than either ground, so its bar has to be
+   light. `scrollbar-color` inherits, so setting the variables on the
+   scroller is enough — both engines pick them up. */
+.scrollbar-on-dark {
+  --scrollbar-thumb: rgb(255 255 255 / 0.16);
+  --scrollbar-thumb-hover: rgb(255 255 255 / 0.3);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* The transparent border plus `content-box` clipping is what gives the
+   thumb its breathing room — a 4px bar centred in a 10px gutter,
+   rather than a 10px bar hard against the edge. */
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
 /* ── components ──────────────────────────────────────────────── */
 
 @layer components {
@@ -271,53 +332,91 @@
     }
   }
 
-  /* Small uppercase label above a section heading. */
+  /* ── the editorial layer ─────────────────────────────────────
+     The page is set, not assembled. Things are separated by rules and
+     by space rather than by boxes with fills and shadows, headings are
+     serif and sized against the text under them, and the saffron is
+     spent on the few places a reader can act rather than on every
+     label. What follows is the small vocabulary that gets us that.
+     ──────────────────────────────────────────────────────────── */
+
+  /* The standing head above a section: a strap of small letterspaced
+     capitals, set in the sans so it reads as apparatus rather than as
+     part of the prose. Grey, not saffron — a label is not an action. */
   .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: block;
+    font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-flame-600);
+    color: var(--text-muted);
   }
 
-  /* A lotus-bud tick before the label — the smallest unit of ornament
-     in the system, and the one that appears most often. */
-  .eyebrow::before {
-    content: "";
-    width: 0.375rem;
-    height: 0.375rem;
-    rotate: 45deg;
-    background: linear-gradient(135deg, var(--color-flame-500), var(--color-gold-400));
+  /* A run of entries divided by hairlines, the way a contents page or a
+     bibliography divides them. No fills, no rounding, no shadow — the
+     rule alone says where one item ends and the next begins. */
+  .rule-list > * + * {
+    border-top: 1px solid var(--border-subtle);
   }
 
+  /* Kept for the handful of places that genuinely enclose something (a
+     figure, a form panel). A hairline and nothing else: no fill against
+     the page, no shadow, and a radius small enough to read as a cut
+     edge rather than a rounded UI tile. */
   .card {
-    background-color: var(--surface-raised);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
     overflow: hidden;
-    transition:
-      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.35s ease;
+    transition: border-color 0.25s ease;
   }
 
+  /* Hover moves ink, never geometry. Nothing on this site lifts off the
+     page or grows when a pointer crosses it. */
   .card-interactive:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lift);
-    border-color: var(--color-flame-300);
+    border-color: var(--border-strong);
   }
 
-  /* Decorative hairline used under section headings. */
+  /* The rule under a section head, full measure. Thicker than a divider
+     hairline so a section opening is legible as one when scanning. */
   .rule-accent::after {
     content: "";
     display: block;
-    width: 3rem;
-    height: 2px;
+    width: 100%;
+    height: 1px;
     margin-top: 0.875rem;
-    background: linear-gradient(90deg, var(--color-flame-500), var(--color-gold-400), transparent);
+    background: var(--border-strong);
+  }
+
+  /* A link in running text, and the standard for every "read on" in the
+     apparatus: underlined at rest — an underline is what a link has
+     looked like for thirty years — and saffron when pointed at. */
+  .link-rule {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    text-decoration-color: var(--border-strong);
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+
+  .link-rule:hover {
+    color: var(--color-flame-700);
+    text-decoration-color: var(--color-flame-500);
+  }
+
+  :root[data-theme="dark"] .link-rule:hover {
+    color: var(--color-flame-300);
+  }
+
+  /* Figures — old numerals in the margin of an index row, durations,
+     page counts. Tabular so a column of them lines up. */
+  .figure-margin {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
   }
 
   /* ── Nepali / spiritual ornament ─────────────────────────────

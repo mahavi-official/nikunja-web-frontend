@@ -29,14 +29,13 @@ export function CoverImage({
 
   if (!url) {
     return (
+      // No picture: a plain sunken panel with the mark set in it, rather than a
+      // gradient standing in for a photograph that does not exist.
       <div
-        className={cn(
-          "flex items-center justify-center bg-linear-to-br from-navy-800 to-navy-950",
-          className
-        )}
+        className={cn("flex items-center justify-center bg-surface-sunken", className)}
         aria-hidden
       >
-        <span className="font-serif text-2xl text-flame-400/70 select-none">
+        <span className="font-serif text-2xl text-ink-muted/70 select-none">
           {fallbackLabel ?? "॥"}
         </span>
       </div>
