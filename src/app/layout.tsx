@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { Cormorant_Garamond, Inter, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { JsonLd } from "@/components/ui/primitives";
 import { getSettings, SITE_URL } from "@/lib/api";
 import { SITE_NAME, SITE_TAGLINE, siteJsonLd } from "@/lib/seo";
+
+/**
+ * The root layout owns the document and the session, and nothing else.
+ *
+ * Site chrome lives in `(site)/layout.tsx` so the CMS at `/admin` can render
+ * its own shell without the public header and footer wrapped around it.
+ */
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,6 +25,22 @@ const serif = Source_Serif_4({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-serif-display",
+});
+
+/** Display face for headings — the elegant, slightly sacred one. */
+const display = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-display-serif",
+});
+
+/** Only loaded for the handful of places the site sets Devanagari. */
+const devanagari = Noto_Serif_Devanagari({
+  subsets: ["devanagari"],
+  weight: ["400", "600"],
+  display: "swap",
+  variable: "--font-devanagari-serif",
 });
 
 const INDEXING_ENABLED = process.env.NEXT_PUBLIC_ENABLE_INDEXING === "true";
@@ -70,8 +91,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fdfbf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#071223" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#080f24" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -82,7 +103,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ga4 = settings["analytics.ga4"];
 
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${serif.variable} ${display.variable} ${devanagari.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Media comes off the CDN — warm the connection before first paint. */}
         {process.env.NEXT_PUBLIC_CDN_URL ? (
@@ -91,13 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <JsonLd data={siteJsonLd(settings)} />
       </head>
       <body className="flex min-h-dvh flex-col">
-        <AuthProvider>
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
 
         {typeof ga4 === "string" && ga4 ? (
           <>

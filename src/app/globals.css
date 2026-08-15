@@ -3,57 +3,83 @@
 /* ═══════════════════════════════════════════════════════════════
    Radhakundah design tokens
 
-   The logo is navy + orange on white. The system reads those as:
-     navy   → structure, authority, everything typographic
-     orange → one accent, used sparingly so it always means "act here"
-     white  → the page, warmed slightly to a paper tone so long-form
-              research reading is comfortable
+   Three colours, in this order of weight:
+
+     white   → the page itself. The dominant surface everywhere.
+               Cards sit on white and are separated by a hairline and
+               a soft shadow, never by a second fill.
+     saffron → the accent. Marigold and monk-robe orange. Every
+               "act here" on the site is this colour and only this.
+     nila    → deep blue. Krishna's colour, and the Himalayan night.
+               Carries depth: the footer, inverted bands, headings.
+
+   Gold is a fourth, decorative only — temple gilding on ornaments
+   and the mandala. It never carries meaning or an action.
+
+   Token names kept from the previous system (`navy`, `flame`, `sand`)
+   so every existing utility class keeps working; the values beneath
+   them are new.
    ═══════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── navy: the primary ── */
-  --color-navy-50: #f2f6fb;
-  --color-navy-100: #e2eaf5;
-  --color-navy-200: #c3d3e9;
-  --color-navy-300: #95b0d3;
-  --color-navy-400: #5f83b4;
-  --color-navy-500: #3a5f95;
-  --color-navy-600: #274a7c;
-  --color-navy-700: #1d3963;
-  --color-navy-800: #142a4a;
-  --color-navy-900: #0d1d35;
-  --color-navy-950: #071223;
+  /* ── nila — the deep blue ── */
+  --color-navy-50: #eef3fc;
+  --color-navy-100: #dbe5f8;
+  --color-navy-200: #b8cbf0;
+  --color-navy-300: #8aa8e2;
+  --color-navy-400: #5a7fcd;
+  --color-navy-500: #3a5cb0;
+  --color-navy-600: #2a4491;
+  --color-navy-700: #223674;
+  --color-navy-800: #1b2a5c;
+  --color-navy-900: #142046;
+  --color-navy-950: #0b1430;
 
-  /* ── orange: the accent ── */
-  --color-flame-50: #fff7ed;
-  --color-flame-100: #ffecd6;
-  --color-flame-200: #fed5ab;
-  --color-flame-300: #fdb676;
-  --color-flame-400: #fb8f3f;
-  --color-flame-500: #f2701b;
-  --color-flame-600: #e0570f;
-  --color-flame-700: #b9400f;
-  --color-flame-800: #933414;
-  --color-flame-900: #772d13;
+  /* ── saffron — the accent ── */
+  --color-flame-50: #fff8ed;
+  --color-flame-100: #ffefd4;
+  --color-flame-200: #fedaa8;
+  --color-flame-300: #fcbe71;
+  --color-flame-400: #fa9938;
+  --color-flame-500: #f77d12;
+  --color-flame-600: #e26108;
+  --color-flame-700: #bb4709;
+  --color-flame-800: #94380f;
+  --color-flame-900: #782f10;
+  --color-flame-950: #411506;
 
-  /* ── warm neutrals: paper, not grey ── */
-  --color-sand-50: #fdfbf7;
-  --color-sand-100: #f8f4ec;
-  --color-sand-200: #efe8db;
-  --color-sand-300: #e0d5c2;
-  --color-sand-400: #c2b49c;
-  --color-sand-500: #9c8d75;
-  --color-sand-600: #7a6c57;
+  /* ── gold — ornament only ── */
+  --color-gold-200: #f6e3b4;
+  --color-gold-300: #eecd82;
+  --color-gold-400: #e0b155;
+  --color-gold-500: #c9953a;
+  --color-gold-600: #a5762c;
+
+  /* ── neutrals: warm greys that sit quietly on white ── */
+  --color-sand-50: #fdfcfa;
+  --color-sand-100: #f7f5f1;
+  --color-sand-200: #ebe7e0;
+  --color-sand-300: #d9d3c8;
+  --color-sand-400: #b6ada0;
+  --color-sand-500: #8d8478;
+  --color-sand-600: #6b635a;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif-display), ui-serif, Georgia, serif;
+  --font-display: var(--font-display-serif), var(--font-serif-display), ui-serif, Georgia, serif;
+  --font-devanagari: var(--font-devanagari-serif), var(--font-serif-display), serif;
 
-  --radius-card: 0.875rem;
+  --radius-card: 1rem;
 
-  --shadow-lift: 0 1px 2px rgb(7 18 35 / 0.04), 0 12px 32px -12px rgb(7 18 35 / 0.16);
-  --shadow-lift-lg: 0 2px 4px rgb(7 18 35 / 0.05), 0 28px 60px -24px rgb(7 18 35 / 0.28);
+  /* Shadows are blue-tinted, not black — on white, neutral shadows
+     read as dirt, blue reads as air. */
+  --shadow-lift: 0 1px 2px rgb(11 20 48 / 0.04), 0 10px 30px -14px rgb(11 20 48 / 0.18);
+  --shadow-lift-lg: 0 2px 6px rgb(11 20 48 / 0.05), 0 30px 60px -28px rgb(11 20 48 / 0.3);
+  --shadow-glow-saffron: 0 10px 34px -12px rgb(226 97 8 / 0.5);
 
   --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
+  --animate-spin-slow: spin 42s linear infinite;
 
   @keyframes rise {
     from {
@@ -65,38 +91,51 @@
       transform: none;
     }
   }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 /* ── semantic surface tokens, light then dark ────────────────── */
 
 :root {
-  --surface: var(--color-sand-50);
+  /* White is the ground. Cards are also white — separation comes from
+     the hairline and the shadow, which is what keeps the page airy. */
+  --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-sunken: var(--color-sand-100);
+  --surface-sunken: #faf8f4;
   --surface-inverse: var(--color-navy-900);
-  --border-subtle: var(--color-sand-200);
-  --border-strong: var(--color-sand-300);
+  --border-subtle: #ece8e1;
+  --border-strong: #dcd6cb;
   --text-primary: var(--color-navy-900);
-  --text-secondary: var(--color-navy-600);
-  --text-muted: var(--color-sand-600);
-  --text-on-inverse: var(--color-sand-100);
+  --text-secondary: #47557a;
+  --text-muted: #7d8299;
+  --text-on-inverse: #eef1f8;
   color-scheme: light;
 }
 
 /* Dark is driven by the reader's system setting only — one mechanism, so the
-   semantic tokens below and Tailwind's `dark:` utilities can never disagree. */
+   semantic tokens below and Tailwind's `dark:` utilities can never disagree.
+   It reads as the deep blue of the palette after dark, not as grey. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: var(--color-navy-950);
-    --surface-raised: #0b1a30;
-    --surface-sunken: #050e1c;
-    --surface-inverse: #0b1a30;
-    --border-subtle: #172a45;
-    --border-strong: #22395a;
-    --text-primary: var(--color-sand-100);
-    --text-secondary: var(--color-navy-200);
-    --text-muted: #8ba2c0;
-    --text-on-inverse: var(--color-sand-100);
+    --surface: #080f24;
+    --surface-raised: #0e1733;
+    --surface-sunken: #050a1a;
+    --surface-inverse: #0e1733;
+    --border-subtle: #1b2648;
+    --border-strong: #27345c;
+    --text-primary: #eef1f8;
+    --text-secondary: #b3c0dd;
+    --text-muted: #8592b4;
+    --text-on-inverse: #eef1f8;
     color-scheme: dark;
   }
 }
@@ -149,10 +188,17 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
+  }
+
+  /* Cormorant runs light and small; display headings get the weight and
+     size back so they hold their own against the body text. */
+  h1,
+  h2 {
+    font-weight: 600;
   }
 
   p {
@@ -199,6 +245,16 @@
     color: var(--color-flame-600);
   }
 
+  /* A lotus-bud tick before the label — the smallest unit of ornament
+     in the system, and the one that appears most often. */
+  .eyebrow::before {
+    content: "";
+    width: 0.375rem;
+    height: 0.375rem;
+    rotate: 45deg;
+    background: linear-gradient(135deg, var(--color-flame-500), var(--color-gold-400));
+  }
+
   .card {
     background-color: var(--surface-raised);
     border: 1px solid var(--border-subtle);
@@ -213,7 +269,7 @@
   .card-interactive:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-lift);
-    border-color: var(--border-strong);
+    border-color: var(--color-flame-300);
   }
 
   /* Decorative hairline used under section headings. */
@@ -223,8 +279,96 @@
     width: 3rem;
     height: 2px;
     margin-top: 0.875rem;
-    background: linear-gradient(90deg, var(--color-flame-500), transparent);
+    background: linear-gradient(90deg, var(--color-flame-500), var(--color-gold-400), transparent);
   }
+
+  /* ── Nepali / spiritual ornament ─────────────────────────────
+     Three motifs, used sparingly:
+       .mandala-field  a barely-there radial geometry behind a section
+       .ornament-rule  a divider with a lotus diamond at its centre
+       .torana         the temple-arch top edge on inverted bands
+     ──────────────────────────────────────────────────────────── */
+
+  /* Concentric rings plus radial spokes — a mandala reduced until it is
+     texture rather than picture. Sits at 3% so it never fights the text. */
+  .mandala-field::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-radial-gradient(
+        circle at 50% 50%,
+        currentColor 0 1px,
+        transparent 1px 46px
+      ),
+      repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        currentColor 0deg 0.35deg,
+        transparent 0.35deg 15deg
+      );
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 72%);
+    opacity: 0.05;
+  }
+
+  .ornament-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--color-gold-400);
+  }
+
+  .ornament-rule::before,
+  .ornament-rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+  }
+
+  /* The pointed arch over a temple doorway, drawn as a mask on the top
+     edge of a band so the band appears to sit under an arch. */
+  .torana-top {
+    -webkit-mask-image: radial-gradient(
+        22rem 4rem at 50% 0,
+        transparent 0 99%,
+        #000 100%
+      ),
+      linear-gradient(#000, #000);
+    -webkit-mask-composite: source-in;
+    mask-image: radial-gradient(22rem 4rem at 50% 0, transparent 0 99%, #000 100%),
+      linear-gradient(#000, #000);
+    mask-composite: intersect;
+  }
+
+  /* Devanagari set in the display serif, for the few places the site
+     speaks Nepali. Larger than latin at the same nominal size. */
+  .devanagari {
+    font-family: var(--font-devanagari);
+    line-height: 1.7;
+  }
+}
+
+/* ── the CMS body editor ─────────────────────────────────────
+   Shares `.prose-content` so what an editor types looks like what a
+   reader gets, with only the affordances a live editor needs added. */
+
+.admin-editor:empty::before,
+.admin-editor:has(> p:only-child:empty)::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* The editor is a fixed-height box, unlike an article page. */
+.admin-editor {
+  font-size: 1rem;
+  overflow-y: auto;
+}
+
+.admin-editor:focus {
+  outline: none;
 }
 
 /* ── long-form rich text (sanitised HTML from the CMS) ───────── */
@@ -233,6 +377,7 @@
   font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--text-primary);
+  font-family: var(--font-serif);
 }
 
 .prose-content > * + * {
@@ -249,13 +394,13 @@
 }
 
 .prose-content h2 {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
 }
 .prose-content h3 {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 }
 .prose-content h4 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .prose-content a {
@@ -299,10 +444,10 @@
 }
 
 .prose-content blockquote {
-  border-left: 3px solid var(--color-flame-400);
+  border-left: 3px solid var(--color-gold-400);
   padding: 0.25rem 0 0.25rem 1.25rem;
-  font-family: var(--font-serif);
-  font-size: 1.15em;
+  font-family: var(--font-display);
+  font-size: 1.3em;
   font-style: italic;
   color: var(--text-secondary);
 }
@@ -328,6 +473,7 @@
   overflow-x: auto;
   font-size: 0.875rem;
   line-height: 1.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .prose-content :not(pre) > code {
@@ -336,6 +482,7 @@
   padding: 0.12em 0.4em;
   border-radius: 0.35rem;
   font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 /* Tables can be wider than the column — let them scroll, never the page. */
@@ -349,6 +496,7 @@
 .prose-content table {
   border-collapse: collapse;
   font-size: 0.9375rem;
+  font-family: var(--font-sans);
 }
 
 .prose-content th,
