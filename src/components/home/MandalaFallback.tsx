@@ -8,6 +8,11 @@ import { cn } from "@/lib/format";
  * disabled sees permanently, and what fills the frame if the context is lost.
  * Same geometry as the 3D scene — sixteen petals, eight petals, a bindu — so
  * the swap between them is not a change of subject.
+ *
+ * Its colours come from `--mandala-*` in `globals.css`, which is also where the
+ * two grounds are defined. A gradient stop cannot be a Tailwind utility, and
+ * hard-coding one palette here would make the cross-fade a visible jump in
+ * colour on whichever ground it was not tuned for.
  */
 export function MandalaFallback({ className }: { className?: string }) {
   const outer = Array.from({ length: 16 }, (_, index) => index * 22.5);
@@ -22,12 +27,12 @@ export function MandalaFallback({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="mandala-petal" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fcbe71" />
-          <stop offset="100%" stopColor="#e26108" />
+          <stop offset="0%" stopColor="var(--mandala-petal-top)" />
+          <stop offset="100%" stopColor="var(--mandala-petal-bottom)" />
         </linearGradient>
         <linearGradient id="mandala-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f6e3b4" />
-          <stop offset="100%" stopColor="#c9953a" />
+          <stop offset="0%" stopColor="var(--mandala-gold-top)" />
+          <stop offset="100%" stopColor="var(--mandala-gold-bottom)" />
         </linearGradient>
         <radialGradient id="mandala-core">
           <stop offset="0%" stopColor="#fff3dc" />
@@ -38,9 +43,9 @@ export function MandalaFallback({ className }: { className?: string }) {
 
       <g transform="translate(200 200)">
         {/* the armillary */}
-        <circle r="168" fill="none" stroke="#e0b155" strokeWidth="2" opacity="0.85" />
-        <ellipse rx="145" ry="58" fill="none" stroke="#e0b155" strokeWidth="1.5" opacity="0.5" />
-        <ellipse rx="58" ry="145" fill="none" stroke="#e0b155" strokeWidth="1.5" opacity="0.5" />
+        <circle r="168" fill="none" stroke="var(--mandala-metal)" strokeWidth="2" opacity="0.85" />
+        <ellipse rx="145" ry="58" fill="none" stroke="var(--mandala-metal)" strokeWidth="1.5" opacity="0.5" />
+        <ellipse rx="58" ry="145" fill="none" stroke="var(--mandala-metal)" strokeWidth="1.5" opacity="0.5" />
 
         {/* the mala — rounded to three places because Node and V8 disagree in
             the last bit of `Math.cos`, and an unrounded value renders as a
@@ -53,7 +58,7 @@ export function MandalaFallback({ className }: { className?: string }) {
               cx={(Math.cos(angle) * 168).toFixed(3)}
               cy={(Math.sin(angle) * 168).toFixed(3)}
               r="3.4"
-              fill="#e0b155"
+              fill="var(--mandala-metal)"
               opacity="0.9"
             />
           );
@@ -81,8 +86,8 @@ export function MandalaFallback({ className }: { className?: string }) {
         ))}
 
         {/* throne and bindu */}
-        <circle r="50" fill="#1b2a5c" />
-        <circle r="50" fill="none" stroke="#e0b155" strokeWidth="2.5" />
+        <circle r="50" className="fill-navy-800 dark:fill-navy-600" />
+        <circle r="50" fill="none" stroke="var(--mandala-metal)" strokeWidth="2.5" />
         <circle r="19" fill="url(#mandala-core)" />
       </g>
     </svg>

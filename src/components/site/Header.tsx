@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogIn, LogOut, Menu, Search, User, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { buttonClass } from "@/components/ui/primitives";
 import { cn } from "@/lib/format";
@@ -131,6 +132,8 @@ export function Header() {
               {searchOpen ? <X className="size-5" /> : <Search className="size-5" />}
             </button>
 
+            <ThemeToggle />
+
             {loading ? (
               <span className="hidden h-9 w-24 animate-pulse rounded-full bg-surface-sunken sm:block" />
             ) : user ? (
@@ -246,6 +249,10 @@ export function Header() {
                 </Link>
               </li>
             ))}
+
+            <li className="mt-1 border-t border-line pt-1">
+              <ThemeToggle variant="full" />
+            </li>
           </ul>
 
           <div className="border-t border-line p-4">

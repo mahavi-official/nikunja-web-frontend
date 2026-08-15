@@ -56,7 +56,7 @@ function HeroGround({ slides, index }: { slides: HeroSlide[]; index: number }) {
       {/* The mandala as texture, centred on where the real one hangs. */}
       <div
         aria-hidden
-        className="mandala-field absolute inset-y-0 right-0 hidden w-[62%] text-navy-700 lg:block"
+        className="mandala-field absolute inset-y-0 right-0 hidden w-[62%] text-navy-700 lg:block dark:text-navy-300"
       />
     </>
   );
@@ -229,7 +229,7 @@ export function StaticHero() {
       />
       <div
         aria-hidden
-        className="mandala-field absolute inset-y-0 right-0 hidden w-[62%] text-navy-700 lg:block"
+        className="mandala-field absolute inset-y-0 right-0 hidden w-[62%] text-navy-700 lg:block dark:text-navy-300"
       />
 
       <div className="container-page relative grid items-center gap-10 py-16 lg:min-h-[42rem] lg:grid-cols-12 lg:gap-6 lg:py-20">

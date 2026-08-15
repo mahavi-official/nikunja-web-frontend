@@ -58,7 +58,7 @@ export async function Footer() {
   );
 
   return (
-    <footer className="mt-24 bg-navy-950 text-sand-200">
+    <footer className="mt-24 border-t border-line bg-navy-950 text-sand-200">
       {/* Newsletter band */}
       <div className="border-b border-white/10">
         <div className="container-page grid gap-8 py-14 md:grid-cols-2 md:items-center">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { MandalaFallback } from "./MandalaFallback";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/format";
 
 /**
@@ -19,6 +20,7 @@ const Mandala3D = dynamic(() => import("./Mandala3D"), { ssr: false });
 
 export function MandalaStage({ className }: { className?: string }) {
   const [live, setLive] = useState(false);
+  const { theme } = useTheme();
 
   return (
     <div className={cn("relative", className)}>
@@ -28,7 +30,7 @@ export function MandalaStage({ className }: { className?: string }) {
           live ? "opacity-0" : "opacity-100"
         )}
       />
-      <Mandala3D className="absolute inset-0" onReady={() => setLive(true)} />
+      <Mandala3D className="absolute inset-0" onReady={() => setLive(true)} theme={theme} />
     </div>
   );
 }

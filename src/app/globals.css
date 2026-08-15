@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* `dark:` follows the reader's explicit choice, not their operating system.
+   `data-theme` on <html> is set before first paint by the inline script in the
+   root layout, and is the single switch behind both this variant and the
+   semantic tokens below — so a utility and a token can never disagree. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ═══════════════════════════════════════════════════════════════
    Radhakundah design tokens
 
@@ -119,25 +125,57 @@
   --text-muted: #7d8299;
   --text-on-inverse: #eef1f8;
   color-scheme: light;
+
+  /* The flat mandala's palette. It is the same object as the WebGL one — it
+     holds the frame until the canvas reports its first drawn frame, and stays
+     for good without WebGL — so it tracks the ground for the same reasons the
+     3D scene does: deeper and more saturated against white, brighter against
+     nila. Kept here rather than in the component so the two grounds sit
+     side by side and can be compared. */
+  --mandala-petal-top: #f9a13a;
+  --mandala-petal-bottom: #d1540a;
+  --mandala-gold-top: #f0d49a;
+  --mandala-gold-bottom: #b8842c;
+  --mandala-metal: #d9a33c;
 }
 
-/* Dark is driven by the reader's system setting only — one mechanism, so the
-   semantic tokens below and Tailwind's `dark:` utilities can never disagree.
-   It reads as the deep blue of the palette after dark, not as grey. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: #080f24;
-    --surface-raised: #0e1733;
-    --surface-sunken: #050a1a;
-    --surface-inverse: #0e1733;
-    --border-subtle: #1b2648;
-    --border-strong: #27345c;
-    --text-primary: #eef1f8;
-    --text-secondary: #b3c0dd;
-    --text-muted: #8592b4;
-    --text-on-inverse: #eef1f8;
-    color-scheme: dark;
-  }
+/* The other ground: the same palette after dark. It reads as the deep blue of
+   the tradition, never as grey. Applied by attribute, so the header toggle and
+   the reader's system preference both resolve to the same one switch. */
+:root[data-theme="dark"] {
+  --surface: #080f24;
+  --surface-raised: #0e1733;
+  --surface-sunken: #050a1a;
+  --surface-inverse: #0e1733;
+  --border-subtle: #1b2648;
+  --border-strong: #27345c;
+  --text-primary: #eef1f8;
+  --text-secondary: #b3c0dd;
+  --text-muted: #8592b4;
+  --text-on-inverse: #eef1f8;
+  color-scheme: dark;
+
+  --mandala-petal-top: #fcbe71;
+  --mandala-petal-bottom: #e26108;
+  --mandala-gold-top: #f6e3b4;
+  --mandala-gold-bottom: #c9953a;
+  --mandala-metal: #e0b155;
+}
+
+/* Only across a switch do colours animate. Left on permanently this would fight
+   every hover state on the page, so the attribute is set for one beat by the
+   toggle and then removed. Transform and opacity are left alone, so nothing
+   that was already moving is slowed down. */
+:root[data-theme-changing],
+:root[data-theme-changing] *,
+:root[data-theme-changing] *::before,
+:root[data-theme-changing] *::after {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease,
+    fill 300ms ease,
+    stroke 300ms ease !important;
 }
 
 @theme inline {
@@ -312,6 +350,12 @@
     opacity: 0.05;
   }
 
+  /* A hairline of light on a dark ground reads fainter than the same hairline
+     of dark on white, so it is given back a little. */
+  :root[data-theme="dark"] .mandala-field::before {
+    opacity: 0.09;
+  }
+
   .ornament-rule {
     display: flex;
     align-items: center;
@@ -415,10 +459,26 @@
   text-decoration-color: var(--color-flame-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .prose-content a {
-    color: var(--color-flame-300);
-  }
+:root[data-theme="dark"] .prose-content a {
+  color: var(--color-flame-300);
+}
+
+:root[data-theme="dark"] .prose-content a:hover {
+  text-decoration-color: var(--color-flame-400);
+}
+
+/* Saffron at 200 is a light-ground colour; on the dark ground the selection
+   needs the deeper end of the ramp to keep the text on it readable. */
+:root[data-theme="dark"] ::selection {
+  background-color: var(--color-flame-700);
+  color: #ffffff;
+}
+
+/* The code block is already the darkest thing on a white page. On the dark
+   ground it has to separate from the surface instead of matching it. */
+:root[data-theme="dark"] .prose-content pre {
+  background: #060d1f;
+  border: 1px solid var(--border-subtle);
 }
 
 .prose-content strong {

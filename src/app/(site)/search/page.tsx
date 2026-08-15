@@ -94,7 +94,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
                 className={cn(
                   "rounded-full px-3.5 py-1.5 text-sm transition-colors",
                   option.value === type
-                    ? "bg-navy-800 text-white"
+                    ? "bg-navy-800 text-white dark:bg-navy-600"
                     : "text-ink-soft hover:bg-surface-sunken"
                 )}
               >

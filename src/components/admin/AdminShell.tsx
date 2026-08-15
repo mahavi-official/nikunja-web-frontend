@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { AdminButton, Spinner, ToastProvider } from "./ui";
 import { LogoMark } from "@/components/site/Logo";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { canEditModule, isAdmin, isStaff, isSuperAdmin, type Viewer } from "@/lib/admin";
 import { cn } from "@/lib/format";
@@ -316,6 +317,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <div className="hidden min-w-0 lg:block" />
 
                 <div className="flex min-w-0 items-center gap-3">
+                  <ThemeToggle className="rounded-lg" />
+
                   <div className="hidden min-w-0 text-right sm:block">
                     <p className="truncate text-[0.8125rem] font-medium text-ink">{user?.name}</p>
                     <p className="truncate text-[0.6875rem] text-ink-muted">{user?.email}</p>

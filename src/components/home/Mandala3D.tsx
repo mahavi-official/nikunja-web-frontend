@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import type { Theme } from "@/lib/theme";
 
 /**
  * The hero's three-dimensional mandala.
@@ -29,7 +30,6 @@ import * as THREE from "three";
 const SAFFRON = 0xf77d12;
 const SAFFRON_DEEP = 0xe26108;
 const GOLD = 0xe0b155;
-const GOLD_LIGHT = 0xf6e3b4;
 const NILA = 0x1b2a5c;
 const NILA_LIGHT = 0x3a5cb0;
 
@@ -38,16 +38,130 @@ const INNER_PETALS = 8;
 const EMBER_COUNT = 260;
 
 /**
+ * Everything that differs between the two grounds, in one table.
+ *
+ * The two are not the same scene with the lights turned down. A white page and
+ * a nila page fail an ornament in opposite directions, and the fixes are
+ * opposite too:
+ *
+ *   on white  the danger is washing out. Every value in the object competes
+ *             with a background already at maximum brightness, so the palette
+ *             is pushed *down* and toward saturation — deeper saffron, a real
+ *             horizon in the environment so the metal has darks to reflect,
+ *             low ambient so the shadowed side of a petal actually goes dark.
+ *             That contrast is the whole reason the thing reads at all.
+ *
+ *   on nila   the danger is disappearing. The palette is pushed *up*, the rim
+ *             light does the work of drawing the silhouette off the page, and
+ *             the exposure is held back so the warm metal does not blow out.
+ *
+ * The additive glows are the sharpest case. Additive blending against white is
+ * a no-op — white is already the maximum, so nothing can be added to it — which
+ * is why the halo and the embers were invisible on the light ground and lit up
+ * on the dark one. On white they blend normally instead, so they are drawn as
+ * warm marks *on* the page rather than as light added to it.
+ */
+interface Ground {
+  /** Equirectangular sky, top to bottom, as canvas gradient stops. */
+  sky: [number, string][];
+  exposure: number;
+  ambient: number;
+  keyIntensity: number;
+  rimColor: number;
+  rimIntensity: number;
+  /** Mirror-finish metal: rings, mala, throne rim. */
+  gold: number;
+  goldRoughness: number;
+  /** The broad flat petals, kept diffuse — see the whorl materials below. */
+  goldPetal: number;
+  saffron: number;
+  saffronLight: number;
+  nila: number;
+  core: number;
+  /** The soft bloom around the bindu. */
+  halo: { color: number; opacity: number; scale: number; additive: boolean };
+  ember: { color: number; opacity: number; size: number; additive: boolean };
+}
+
+const GROUNDS: Record<Theme, Ground> = {
+  light: {
+    // A true horizon, not a white room. The old sky was near-white through its
+    // whole upper half, so the gold reflected white on top and white below and
+    // came out as beige card. Warm above, deep nila below, and the same metal
+    // now has a bright edge and a dark belly — which is what gold looks like.
+    sky: [
+      [0, "#fff4de"],
+      [0.3, "#ffdca1"],
+      [0.5, "#c8d2ec"],
+      [0.72, "#3a5cb0"],
+      [1, "#101a3d"],
+    ],
+    // Under 1, so colour survives the tone map instead of being pushed to the
+    // top of the curve where everything turns pale.
+    exposure: 0.94,
+    // Low, deliberately. Ambient fill is what flattens an object against a
+    // bright page; without it the petals keep a shadowed side and a silhouette.
+    ambient: 0.2,
+    keyIntensity: 2.7,
+    rimColor: NILA_LIGHT,
+    rimIntensity: 1.5,
+    gold: 0xd9a33c,
+    goldRoughness: 0.18,
+    goldPetal: 0xe6b757,
+    // Flame-600 and 500 rather than 500 and 400: on white the brighter pair
+    // read as pastel, and saffron that reads as pastel is not saffron.
+    saffron: SAFFRON_DEEP,
+    saffronLight: SAFFRON,
+    nila: NILA,
+    core: 0xffcf8a,
+    // Tighter and lighter than the additive version: warm ink laid over the
+    // page reaches full strength immediately, where added light never does.
+    halo: { color: 0xf98c1d, opacity: 0.42, scale: 0.8, additive: false },
+    ember: { color: 0xd97a12, opacity: 0.55, size: 0.05, additive: false },
+  },
+  dark: {
+    // A lamp above, not a sky. Reusing the white sky here would make the
+    // mandala glow like a lightbox cut out of the page; dropping the sky to
+    // match the page would kill the gold outright.
+    sky: [
+      [0, "#f4dcae"],
+      [0.36, "#8d7549"],
+      [0.62, "#22305a"],
+      [1, "#080f24"],
+    ],
+    exposure: 0.92,
+    ambient: 0.16,
+    keyIntensity: 2.1,
+    rimColor: 0x6f92da,
+    rimIntensity: 1.7,
+    gold: GOLD,
+    goldRoughness: 0.24,
+    goldPetal: 0xf0cd85,
+    saffron: SAFFRON,
+    saffronLight: 0xfa9938,
+    // The throne is the darkest thing in the scene; on the dark ground it has
+    // to step up a rung or it merges with the page behind the flower.
+    nila: 0x33509b,
+    core: 0xffd9a0,
+    halo: { color: SAFFRON, opacity: 0.75, scale: 1.15, additive: true },
+    ember: { color: 0xf6e3b4, opacity: 0.85, size: 0.045, additive: true },
+  },
+};
+
+/**
  * The world the metal reflects.
  *
  * A metallic surface with no environment reflects nothing and renders as dark
  * grey — gold in particular dies without one. Rather than ship an HDR, this
- * paints a two-stop equirectangular gradient: warm light above, deep blue
- * below, exactly the palette the page is built from. The gold then picks up a
- * cream sky on its upper curve and a blue ground underneath, which is what
- * makes it read as gold rather than as beige plastic.
+ * paints an equirectangular gradient from the ground's `sky` stops, which are
+ * the palette the page is built from. The gold then picks up warm light on its
+ * upper curve and deep blue underneath, and that split is what makes it read as
+ * metal rather than as paint.
  */
-function paletteEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture | null {
+function paletteEnvironment(
+  renderer: THREE.WebGLRenderer,
+  ground: Ground
+): THREE.Texture | null {
   const canvas = document.createElement("canvas");
   canvas.width = 32;
   canvas.height = 128;
@@ -56,10 +170,7 @@ function paletteEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture | null
   if (!context) return null;
 
   const gradient = context.createLinearGradient(0, 0, 0, 128);
-  gradient.addColorStop(0, "#fff6e6"); // warm zenith
-  gradient.addColorStop(0.4, "#ffffff"); // the white page itself
-  gradient.addColorStop(0.62, "#dfe6f5");
-  gradient.addColorStop(1, "#2a4491"); // deep blue underfoot
+  for (const [offset, colour] of ground.sky) gradient.addColorStop(offset, colour);
   context.fillStyle = gradient;
   context.fillRect(0, 0, 32, 128);
 
@@ -73,6 +184,37 @@ function paletteEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture | null
   pmrem.dispose();
 
   return target.texture;
+}
+
+/**
+ * A soft round falloff, used for the bindu's halo and for every ember.
+ *
+ * Points without a map render as hard squares, and a sphere without one renders
+ * as a disc with an edge. Both want the same thing — bright at the centre,
+ * nothing at the rim — so one texture serves both, drawn white and tinted per
+ * use by the material's colour.
+ */
+function glowTexture(): THREE.Texture {
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext("2d");
+  if (context) {
+    const half = size / 2;
+    const gradient = context.createRadialGradient(half, half, 0, half, half, half);
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(0.22, "rgba(255,255,255,0.72)");
+    gradient.addColorStop(0.55, "rgba(255,255,255,0.2)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, size, size);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
 }
 
 /** A lotus petal in the XY plane: base at the origin, tip at +Y. */
@@ -132,10 +274,18 @@ function whorl(
 export default function Mandala3D({
   className,
   onReady,
+  theme = "light",
 }: {
   className?: string;
   /** Fires once the first frame is on screen, so the flat fallback can retire. */
   onReady?: () => void;
+  /**
+   * The ground the canvas is sitting on. Changing it rebuilds the scene — the
+   * environment map is baked through PMREM and the exposure is set at build
+   * time, so a switch is cheaper to express as a teardown than as a dozen live
+   * mutations that would have to be kept in step by hand.
+   */
+  theme?: Theme;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const ready = useRef(onReady);
@@ -146,6 +296,7 @@ export default function Mandala3D({
     if (!mount) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ground = GROUNDS[theme];
 
     // ── renderer ──────────────────────────────────────────────
     let renderer: THREE.WebGLRenderer;
@@ -165,10 +316,10 @@ export default function Mandala3D({
     mount.appendChild(renderer.domElement);
 
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = ground.exposure;
 
     const scene = new THREE.Scene();
-    const environment = paletteEnvironment(renderer);
+    const environment = paletteEnvironment(renderer, ground);
     if (environment) scene.environment = environment;
 
     const camera = new THREE.PerspectiveCamera(
@@ -192,16 +343,16 @@ export default function Mandala3D({
 
     const goldMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: GOLD,
-        metalness: 0.92,
-        roughness: 0.24,
+        color: ground.gold,
+        metalness: 0.94,
+        roughness: ground.goldRoughness,
         emissive: new THREE.Color(0x2a1a04),
       })
     );
 
     const goldPetalMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: 0xf0cd85,
+        color: ground.goldPetal,
         // Kept well below the rings': a petal presents a broad flat face to the
         // camera, and at mirror metalness that face reflects the blue band of
         // the environment and reads olive. Diffuse gold survives every angle.
@@ -213,7 +364,7 @@ export default function Mandala3D({
 
     const saffronMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: SAFFRON,
+        color: ground.saffron,
         metalness: 0.32,
         roughness: 0.38,
         emissive: new THREE.Color(SAFFRON_DEEP).multiplyScalar(0.16),
@@ -222,7 +373,7 @@ export default function Mandala3D({
 
     const nilaMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: NILA,
+        color: ground.nila,
         metalness: 0.68,
         roughness: 0.32,
         emissive: new THREE.Color(0x060b1c),
@@ -231,7 +382,7 @@ export default function Mandala3D({
 
     const saffronLightMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: 0xfa9938,
+        color: ground.saffronLight,
         metalness: 0.3,
         roughness: 0.42,
         emissive: new THREE.Color(SAFFRON_DEEP).multiplyScalar(0.12),
@@ -335,7 +486,7 @@ export default function Mandala3D({
     // ── 5. the bindu ──────────────────────────────────────────
     const coreMaterial = track(
       new THREE.MeshStandardMaterial({
-        color: 0xffd9a0,
+        color: ground.core,
         emissive: new THREE.Color(SAFFRON),
         emissiveIntensity: 1.5,
         metalness: 0.1,
@@ -345,18 +496,30 @@ export default function Mandala3D({
     const core = new THREE.Mesh(track(new THREE.IcosahedronGeometry(0.3, 3)), coreMaterial);
     world.add(core);
 
-    // A larger, additive shell around it reads as the glow of a flame.
+    // The flame around the bindu, as a camera-facing sprite with a soft radial
+    // falloff. It was a hard-edged sphere with additive blending, which meant
+    // it contributed nothing at all on the white ground; drawn from a falloff
+    // texture it works under either blend mode, so each ground can pick the one
+    // that actually shows — added light on nila, warm ink on white.
+    const glow = track(glowTexture());
     const haloMaterial = track(
-      new THREE.MeshBasicMaterial({
-        color: SAFFRON,
+      new THREE.SpriteMaterial({
+        map: glow,
+        color: ground.halo.color,
         transparent: true,
-        opacity: 0.16,
-        blending: THREE.AdditiveBlending,
+        opacity: ground.halo.opacity,
+        blending: ground.halo.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
         depthWrite: false,
-        side: THREE.BackSide,
+        // A flat quad through the middle of a flower intersects its petals; the
+        // depth test would slice the glow along those seams. Drawn last and
+        // untested, it lies over the centre the way a bloom does.
+        depthTest: false,
       })
     );
-    const halo = new THREE.Mesh(track(new THREE.SphereGeometry(0.66, 24, 24)), haloMaterial);
+    const haloScale = 2.6 * ground.halo.scale;
+    const halo = new THREE.Sprite(haloMaterial);
+    halo.scale.setScalar(haloScale);
+    halo.renderOrder = 10;
     world.add(halo);
 
     // ── 6. embers ─────────────────────────────────────────────
@@ -376,15 +539,19 @@ export default function Mandala3D({
     const emberGeometry = track(new THREE.BufferGeometry());
     emberGeometry.setAttribute("position", new THREE.BufferAttribute(emberPositions, 3));
 
+    // Same story as the halo: additive embers were invisible over white. They
+    // also carry the falloff texture now, so each one is a soft mote instead of
+    // the hard square an unmapped point renders as.
     const embers = new THREE.Points(
       emberGeometry,
       track(
         new THREE.PointsMaterial({
-          color: GOLD_LIGHT,
-          size: 0.045,
+          map: glow,
+          color: ground.ember.color,
+          size: ground.ember.size,
           transparent: true,
-          opacity: 0.85,
-          blending: THREE.AdditiveBlending,
+          opacity: ground.ember.opacity,
+          blending: ground.ember.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
           depthWrite: false,
           sizeAttenuation: true,
         })
@@ -393,14 +560,19 @@ export default function Mandala3D({
     scene.add(embers);
 
     // ── light ─────────────────────────────────────────────────
-    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+    // Ambient fill is what flattens an object against its page, so both grounds
+    // keep it low and let the key carry the form.
+    scene.add(new THREE.AmbientLight(0xffffff, ground.ambient));
 
-    const key = new THREE.DirectionalLight(0xfff2dd, 2.4);
+    const key = new THREE.DirectionalLight(0xfff2dd, ground.keyIntensity);
     key.position.set(3.4, 4.2, 5.5);
     scene.add(key);
 
-    // Cool rim from behind, so the gold does not go flat against a white page.
-    const rim = new THREE.DirectionalLight(NILA_LIGHT, 1.1);
+    // Cool rim from behind, drawing a blue edge down one side of the gold. On
+    // white that edge is the darkest thing on the silhouette and is what lifts
+    // it off the page; on nila it is the brightest, and does the same job in
+    // reverse.
+    const rim = new THREE.DirectionalLight(ground.rimColor, ground.rimIntensity);
     rim.position.set(-4.5, -2, -3.5);
     scene.add(rim);
 
@@ -447,10 +619,11 @@ export default function Mandala3D({
       core.rotation.y = elapsed * 0.22;
       core.rotation.x = elapsed * 0.14;
 
-      // The breath: a slow pulse on the core and its glow.
+      // The breath: a slow pulse on the core and its glow. The halo pulses
+      // about its own base size, which the ground sets, not about 1.
       const breath = 1 + Math.sin(elapsed * 0.9) * 0.055;
       core.scale.setScalar(breath);
-      halo.scale.setScalar(1 + Math.sin(elapsed * 0.9) * 0.09);
+      halo.scale.setScalar(haloScale * (1 + Math.sin(elapsed * 0.9) * 0.09));
       coreMaterial.emissiveIntensity = 1.35 + Math.sin(elapsed * 0.9) * 0.3;
       coreLight.intensity = 3 + Math.sin(elapsed * 0.9) * 0.7;
 
@@ -524,7 +697,7 @@ export default function Mandala3D({
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [theme]);
 
   return <div ref={host} className={className} aria-hidden />;
 }

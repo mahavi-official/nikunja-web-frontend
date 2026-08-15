@@ -125,7 +125,7 @@ export function PostArticle({
             </div>
 
             <aside className="mt-12 flex items-start gap-4 rounded-[var(--radius-card)] bg-surface-sunken p-6">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy-800 text-lg font-semibold text-white">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy-800 text-lg font-semibold text-white dark:bg-navy-600">
                 {post.author.name.charAt(0)}
               </span>
               <div>

@@ -4,9 +4,11 @@ import Script from "next/script";
 import "./globals.css";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { JsonLd } from "@/components/ui/primitives";
 import { getSettings, SITE_URL } from "@/lib/api";
 import { SITE_NAME, SITE_TAGLINE, siteJsonLd } from "@/lib/seo";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 /**
  * The root layout owns the document and the session, and nothing else.
@@ -89,11 +91,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * One `theme-color`, not a media-keyed pair: the reader's choice can differ from
+ * their system setting, so the browser chrome is kept in step by `ThemeProvider`
+ * rewriting this tag rather than by a media query that would contradict it.
+ */
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#080f24" },
-  ],
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 };
@@ -109,6 +113,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
+        {/* Resolves the ground — white or nila — before anything is painted, so
+            a reader who chose dark never gets a frame of white first. Must stay
+            ahead of the stylesheet and outside React's hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+
         {/* Media comes off the CDN — warm the connection before first paint. */}
         {process.env.NEXT_PUBLIC_CDN_URL ? (
           <link rel="preconnect" href={process.env.NEXT_PUBLIC_CDN_URL} crossOrigin="" />
@@ -116,7 +125,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <JsonLd data={siteJsonLd(settings)} />
       </head>
       <body className="flex min-h-dvh flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
 
         {typeof ga4 === "string" && ga4 ? (
           <>
