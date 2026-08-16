@@ -78,6 +78,9 @@ interface Ground {
   saffronLight: number;
   nila: number;
   core: number;
+  /** What the bindu emits, and the colour of the light it casts on its petals. */
+  coreEmissive: number;
+  coreLight: number;
   /** The soft bloom around the bindu. */
   halo: { color: number; opacity: number; scale: number; additive: boolean };
   ember: { color: number; opacity: number; size: number; additive: boolean };
@@ -113,10 +116,18 @@ const GROUNDS: Record<Theme, Ground> = {
     saffron: SAFFRON_DEEP,
     saffronLight: SAFFRON,
     nila: NILA,
-    core: 0xffcf8a,
+    // On the light ground the centre is a lamp, not an ember: a pale yellow
+    // bindu inside a light yellow bloom. Keeping the core itself near-white and
+    // letting the emission carry the yellow is what stops it reading as a flat
+    // mustard dot — the falloff around it is where the colour is meant to live.
+    core: 0xfff6d8,
+    coreEmissive: 0xffd45c,
+    coreLight: 0xffd97a,
     // Tighter and lighter than the additive version: warm ink laid over the
     // page reaches full strength immediately, where added light never does.
-    halo: { color: 0xf98c1d, opacity: 0.42, scale: 0.8, additive: false },
+    // Held a little wider and stronger than the old orange, because a pale
+    // yellow needs more area over a bright page to register as a glow at all.
+    halo: { color: 0xffdd7a, opacity: 0.62, scale: 0.95, additive: false },
     ember: { color: 0xd97a12, opacity: 0.55, size: 0.05, additive: false },
   },
   dark: {
@@ -143,6 +154,8 @@ const GROUNDS: Record<Theme, Ground> = {
     // to step up a rung or it merges with the page behind the flower.
     nila: 0x33509b,
     core: 0xffd9a0,
+    coreEmissive: SAFFRON,
+    coreLight: SAFFRON,
     halo: { color: SAFFRON, opacity: 0.75, scale: 1.15, additive: true },
     ember: { color: 0xf6e3b4, opacity: 0.85, size: 0.045, additive: true },
   },
@@ -487,7 +500,7 @@ export default function Mandala3D({
     const coreMaterial = track(
       new THREE.MeshStandardMaterial({
         color: ground.core,
-        emissive: new THREE.Color(SAFFRON),
+        emissive: new THREE.Color(ground.coreEmissive),
         emissiveIntensity: 1.5,
         metalness: 0.1,
         roughness: 0.45,
@@ -577,7 +590,7 @@ export default function Mandala3D({
     scene.add(rim);
 
     // The bindu lights its own petals.
-    const coreLight = new THREE.PointLight(SAFFRON, 3.2, 7, 2);
+    const coreLight = new THREE.PointLight(ground.coreLight, 3.2, 7, 2);
     world.add(coreLight);
 
     // ── motion ────────────────────────────────────────────────

@@ -9,6 +9,7 @@ import {
   FileText,
   Film,
   Gauge,
+  Home,
   Images,
   Inbox,
   LayoutTemplate,
@@ -347,6 +348,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   </button>
 
                   <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
+                    {/* The rail's "View the site" is at the bottom of a
+                        scrolling column, and on small screens it is behind the
+                        menu entirely — the way out of the CMS should be on the
+                        bar at all times. */}
+                    <Link
+                      href="/"
+                      title="Go to the public site"
+                      aria-label="Go to the public site"
+                      className="grid size-9 shrink-0 place-items-center text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <Home className="size-4" />
+                    </Link>
+
                     <ThemeToggle />
 
                     <span className="hidden h-6 w-px shrink-0 bg-line sm:block" aria-hidden />

@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogIn, LogOut, Menu, Search, User, X } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut, Menu, Search, User, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { buttonClass } from "@/components/ui/primitives";
+import { isStaff } from "@/lib/admin";
 import { cn } from "@/lib/format";
 
 const NAV = [
@@ -28,6 +29,10 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const searchInput = useRef<HTMLInputElement>(null);
   const { user, loading, signIn, signOut } = useAuth();
+
+  // Editors and above get a way into the CMS from the public site. Hiding this
+  // is convenience, not enforcement — /admin checks the role again itself.
+  const staff = isStaff(user);
 
   // Close everything on navigation.
   useEffect(() => {
@@ -137,6 +142,12 @@ export function Header() {
               <span className="hidden h-9 w-24 animate-pulse bg-surface-sunken sm:block" />
             ) : user ? (
               <div className="hidden items-center gap-3 sm:flex">
+                {staff ? (
+                  <Link href="/admin" className={buttonClass("secondary", "sm")}>
+                    <LayoutDashboard className="size-4" aria-hidden />
+                    Console
+                  </Link>
+                ) : null}
                 <Link
                   href="/account"
                   className="link-rule text-sm text-ink-soft"
@@ -256,6 +267,12 @@ export function Header() {
           <div className="border-t border-line p-4">
             {user ? (
               <div className="space-y-2">
+                {staff ? (
+                  <Link href="/admin" className={buttonClass("primary", "md", "w-full")}>
+                    <LayoutDashboard className="size-4" aria-hidden />
+                    Console
+                  </Link>
+                ) : null}
                 <Link href="/account" className={buttonClass("secondary", "md", "w-full")}>
                   <User className="size-4" aria-hidden />
                   {user.name}
