@@ -135,7 +135,7 @@ function AboutEditor() {
   return (
     <>
       <PageHeader
-        title="Pages"
+        title="About CMS"
         description="Standing content that is not an article. About is the only one today."
         actions={
           <AdminButton onClick={save} loading={saving}>

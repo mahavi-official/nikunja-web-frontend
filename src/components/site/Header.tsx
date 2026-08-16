@@ -125,7 +125,7 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setSearchOpen((open) => !open)}
@@ -164,14 +164,20 @@ export function Header() {
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => signIn()}
-                className={buttonClass("secondary", "sm", "hidden sm:inline-flex")}
-              >
-                <LogIn className="size-4" aria-hidden />
-                Sign in
-              </button>
+              /* Hidden on phones by a wrapper, not by a `hidden` on the button
+                 itself — `buttonClass` already sets `inline-flex`, and the two
+                 display utilities would resolve by stylesheet order, not by
+                 the order they are written here. */
+              <span className="hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => signIn()}
+                  className={buttonClass("secondary", "sm")}
+                >
+                  <LogIn className="size-4" aria-hidden />
+                  Sign in
+                </button>
+              </span>
             )}
 
             <button
@@ -196,7 +202,7 @@ export function Header() {
                 name="q"
                 placeholder="Search research, articles, and videos…"
                 aria-label="Search query"
-                className="h-10 flex-1 bg-transparent font-serif text-base outline-none placeholder:text-ink-muted"
+                className="h-10 min-w-0 flex-1 bg-transparent font-serif text-base outline-none placeholder:text-ink-muted"
               />
               <button type="submit" className={buttonClass("primary", "sm")}>
                 Search
@@ -206,13 +212,24 @@ export function Header() {
         ) : null}
       </header>
 
-      {/* Mobile sheet */}
+      {/* Mobile sheet.
+
+          `overflow-hidden` on this frame is load-bearing: the sheet is parked
+          off the right edge at `translate-x-full` while it is closed, and
+          without the clip that parked slab is a 20rem-wide thing sitting
+          outside the viewport. Engines disagree about whether that counts as
+          page overflow, and the ones that let a reader drag towards it show a
+          strip of nothing down the right-hand side. It slides in from the
+          clipped edge exactly as before. */}
       <div
         className={cn(
-          "fixed inset-0 z-60 lg:hidden",
+          "fixed inset-0 z-60 overflow-hidden lg:hidden",
           menuOpen ? "pointer-events-auto" : "pointer-events-none"
         )}
-        aria-hidden={!menuOpen}
+        /* `inert` rather than `aria-hidden` alone: the links in the parked
+           sheet are still in the tab order otherwise, and tabbing to one
+           scrolls the clipped frame far enough to bring it back into view. */
+        inert={!menuOpen}
       >
         <div
           onClick={() => setMenuOpen(false)}

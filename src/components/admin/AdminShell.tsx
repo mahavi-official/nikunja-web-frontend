@@ -111,7 +111,7 @@ const NAV: NavGroup[] = [
     title: "Site",
     items: [
       { href: "/admin/hero", label: "Hero slides", Icon: Sparkles, guard: isStaff },
-      { href: "/admin/pages", label: "Pages", Icon: LayoutTemplate, guard: isStaff },
+      { href: "/admin/pages", label: "About CMS", Icon: LayoutTemplate, guard: isStaff },
       { href: "/admin/media", label: "Media library", Icon: Images, guard: isStaff },
     ],
   },
