@@ -7,7 +7,7 @@ import { buildPageMetadata, SITE_TAGLINE } from "@/lib/seo";
 import { formatDate, formatDateShort, isoDate } from "@/lib/format";
 
 // Listings: one minute of staleness at worst.
-export const revalidate = 60;
+export const revalidate = 0;
 
 export async function generateMetadata() {
   const settings = await getSettings();

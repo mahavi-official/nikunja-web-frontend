@@ -124,7 +124,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : null}
         <JsonLd data={siteJsonLd(settings)} />
       </head>
-      <body className="flex min-h-dvh flex-col">
+      <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
