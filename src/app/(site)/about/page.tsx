@@ -4,7 +4,12 @@ import { metadataFromSeo, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs, ButtonLink, JsonLd, SectionHeading } from "@/components/ui/primitives";
 import type { AboutSections } from "@/lib/types";
 
-// The About page is edited rarely; an hour of staleness is fine.
+// Saving the page in admin clears this cache immediately (see
+// `app/api/revalidate`), so the window below is only the fallback for a
+// revalidation that never arrived. It matches the hour `getAboutPage()` caches
+// its fetch for — a shorter window here would only rebuild the page around the
+// same hour-old data.
+
 export const revalidate = 3600;
 
 export async function generateMetadata() {
@@ -61,9 +66,11 @@ export default async function AboutPage() {
           <span className="eyebrow">Who we are</span>
           <h1 className="mt-2 text-3xl md:text-5xl">{page.title}</h1>
           {text(sections.about) ? (
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed whitespace-pre-line text-ink-soft">
-              {text(sections.about)}
-            </p>
+            // Sanitised HTML from the CMS's rich-text editor — same pattern as PostArticle.
+            <div
+              className="prose-content mt-6 max-w-3xl text-lg text-ink-soft"
+              dangerouslySetInnerHTML={{ __html: text(sections.about)! }}
+            />
           ) : null}
         </div>
       </header>

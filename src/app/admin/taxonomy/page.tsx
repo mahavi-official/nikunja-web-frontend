@@ -176,7 +176,7 @@ function Categories() {
               value={scope}
               aria-label="Category scope"
               onChange={(event) => setScope(event.target.value as CategoryScope)}
-              className="h-8 py-0 text-[0.8125rem]"
+              className="py-1.5 text-[0.8125rem]"
             >
               {SCOPES.map((item) => (
                 <option key={item.value} value={item.value}>
