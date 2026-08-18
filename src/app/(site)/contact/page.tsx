@@ -3,6 +3,7 @@ import { getSettings } from "@/lib/api";
 import { absoluteUrl, buildPageMetadata, breadcrumbJsonLd, SITE_NAME } from "@/lib/seo";
 import { Breadcrumbs, JsonLd } from "@/components/ui/primitives";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { LocationMap } from "@/components/contact/LocationMap";
 import type { Settings } from "@/lib/types";
 
 // Contact details change rarely.
@@ -11,6 +12,12 @@ export const revalidate = 3600;
 function value(settings: Settings, key: string): string | null {
   const raw = settings[key];
   return typeof raw === "string" && raw.trim() ? raw.trim() : null;
+}
+
+function coordinate(settings: Settings, key: string): number | null {
+  const raw = value(settings, key);
+  const parsed = raw === null ? NaN : Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export async function generateMetadata() {
@@ -29,6 +36,20 @@ export default async function ContactPage() {
   const phone = value(settings, "contact.phone");
   const address = value(settings, "contact.address");
   const mapEmbed = value(settings, "contact.mapEmbed");
+
+  // The map falls back to its own default pin; the CMS only overrides it when it
+  // supplies both coordinates, so a half-filled setting can't drop it in the ocean.
+  const lat = coordinate(settings, "contact.mapLat");
+  const lng = coordinate(settings, "contact.mapLng");
+  const place =
+    lat !== null && lng !== null
+      ? {
+          lat,
+          lng,
+          label: value(settings, "contact.mapLabel") ?? undefined,
+          area: address ?? undefined,
+        }
+      : {};
 
   const trail = [
     { name: "Home", url: "/" },
@@ -109,17 +130,7 @@ export default async function ContactPage() {
             </ul>
           ) : null}
 
-          {mapEmbed ? (
-            <div className="mt-8 overflow-hidden rounded-[var(--radius-card)] border border-line">
-              <iframe
-                src={mapEmbed}
-                title="Office location"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="aspect-4/3 w-full"
-              />
-            </div>
-          ) : null}
+          <LocationMap embedUrl={mapEmbed} {...place} />
         </aside>
       </div>
     </>

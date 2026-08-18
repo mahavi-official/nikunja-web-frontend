@@ -1,59 +1,94 @@
 @import "tailwindcss";
 
+/* `dark:` follows the reader's explicit choice, not their operating system.
+   `data-theme` on <html> is set before first paint by the inline script in the
+   root layout, and is the single switch behind both this variant and the
+   semantic tokens below — so a utility and a token can never disagree. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ═══════════════════════════════════════════════════════════════
    Radhakundah design tokens
 
-   The logo is navy + orange on white. The system reads those as:
-     navy   → structure, authority, everything typographic
-     orange → one accent, used sparingly so it always means "act here"
-     white  → the page, warmed slightly to a paper tone so long-form
-              research reading is comfortable
+   Three colours, in this order of weight:
+
+     white   → the page itself. The dominant surface everywhere.
+               Cards sit on white and are separated by a hairline and
+               a soft shadow, never by a second fill.
+     saffron → the accent. Marigold and monk-robe orange. Every
+               "act here" on the site is this colour and only this.
+     nila    → deep blue. Krishna's colour, and the Himalayan night.
+               Carries depth: the footer, inverted bands, headings.
+
+   Gold is a fourth, decorative only — temple gilding on ornaments
+   and the mandala. It never carries meaning or an action.
+
+   Token names kept from the previous system (`navy`, `flame`, `sand`)
+   so every existing utility class keeps working; the values beneath
+   them are new.
    ═══════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── navy: the primary ── */
-  --color-navy-50: #f2f6fb;
-  --color-navy-100: #e2eaf5;
-  --color-navy-200: #c3d3e9;
-  --color-navy-300: #95b0d3;
-  --color-navy-400: #5f83b4;
-  --color-navy-500: #3a5f95;
-  --color-navy-600: #274a7c;
-  --color-navy-700: #1d3963;
-  --color-navy-800: #142a4a;
-  --color-navy-900: #0d1d35;
-  --color-navy-950: #071223;
+  /* ── nila — the deep blue ── */
+  --color-navy-50: #eef3fc;
+  --color-navy-100: #dbe5f8;
+  --color-navy-200: #b8cbf0;
+  --color-navy-300: #8aa8e2;
+  --color-navy-400: #5a7fcd;
+  --color-navy-500: #3a5cb0;
+  --color-navy-600: #2a4491;
+  --color-navy-700: #223674;
+  --color-navy-800: #1b2a5c;
+  --color-navy-900: #142046;
+  --color-navy-950: #0b1430;
 
-  /* ── orange: the accent ── */
-  --color-flame-50: #fff7ed;
-  --color-flame-100: #ffecd6;
-  --color-flame-200: #fed5ab;
-  --color-flame-300: #fdb676;
-  --color-flame-400: #fb8f3f;
-  --color-flame-500: #f2701b;
-  --color-flame-600: #e0570f;
-  --color-flame-700: #b9400f;
-  --color-flame-800: #933414;
-  --color-flame-900: #772d13;
+  /* ── saffron — the accent ── */
+  --color-flame-50: #fff8ed;
+  --color-flame-100: #ffefd4;
+  --color-flame-200: #fedaa8;
+  --color-flame-300: #fcbe71;
+  --color-flame-400: #fa9938;
+  --color-flame-500: #f77d12;
+  --color-flame-600: #e26108;
+  --color-flame-700: #bb4709;
+  --color-flame-800: #94380f;
+  --color-flame-900: #782f10;
+  --color-flame-950: #411506;
 
-  /* ── warm neutrals: paper, not grey ── */
-  --color-sand-50: #fdfbf7;
-  --color-sand-100: #f8f4ec;
-  --color-sand-200: #efe8db;
-  --color-sand-300: #e0d5c2;
-  --color-sand-400: #c2b49c;
-  --color-sand-500: #9c8d75;
-  --color-sand-600: #7a6c57;
+  /* ── gold — ornament only ── */
+  --color-gold-200: #f6e3b4;
+  --color-gold-300: #eecd82;
+  --color-gold-400: #e0b155;
+  --color-gold-500: #c9953a;
+  --color-gold-600: #a5762c;
+
+  /* ── neutrals: warm greys that sit quietly on white ── */
+  --color-sand-50: #fdfcfa;
+  --color-sand-100: #f7f5f1;
+  --color-sand-200: #ebe7e0;
+  --color-sand-300: #d9d3c8;
+  --color-sand-400: #b6ada0;
+  --color-sand-500: #8d8478;
+  --color-sand-600: #6b635a;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif-display), ui-serif, Georgia, serif;
+  --font-display: var(--font-display-serif), var(--font-serif-display), ui-serif, Georgia, serif;
+  --font-devanagari: var(--font-devanagari-serif), var(--font-serif-display), serif;
 
-  --radius-card: 0.875rem;
+  /* Printed matter has corners. Two pixels is enough to keep an image from
+     looking like it was cut with a blunt knife, and not enough to read as a
+     "card" in the app sense. */
+  --radius-card: 0.125rem;
 
-  --shadow-lift: 0 1px 2px rgb(7 18 35 / 0.04), 0 12px 32px -12px rgb(7 18 35 / 0.16);
-  --shadow-lift-lg: 0 2px 4px rgb(7 18 35 / 0.05), 0 28px 60px -24px rgb(7 18 35 / 0.28);
+  /* Shadows are blue-tinted, not black — on white, neutral shadows
+     read as dirt, blue reads as air. Used now only where something genuinely
+     floats above the page (the mobile sheet), never to lift a list item. */
+  --shadow-lift: 0 1px 2px rgb(11 20 48 / 0.04), 0 10px 30px -14px rgb(11 20 48 / 0.18);
+  --shadow-lift-lg: 0 2px 6px rgb(11 20 48 / 0.05), 0 30px 60px -28px rgb(11 20 48 / 0.3);
 
   --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
+  --animate-spin-slow: spin 42s linear infinite;
 
   @keyframes rise {
     from {
@@ -65,40 +100,85 @@
       transform: none;
     }
   }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 /* ── semantic surface tokens, light then dark ────────────────── */
 
 :root {
-  --surface: var(--color-sand-50);
+  /* White is the ground. Cards are also white — separation comes from
+     the hairline and the shadow, which is what keeps the page airy. */
+  --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-sunken: var(--color-sand-100);
+  --surface-sunken: #faf8f4;
   --surface-inverse: var(--color-navy-900);
-  --border-subtle: var(--color-sand-200);
-  --border-strong: var(--color-sand-300);
+  --border-subtle: #ece8e1;
+  --border-strong: #dcd6cb;
   --text-primary: var(--color-navy-900);
-  --text-secondary: var(--color-navy-600);
-  --text-muted: var(--color-sand-600);
-  --text-on-inverse: var(--color-sand-100);
+  --text-secondary: #47557a;
+  --text-muted: #7d8299;
+  --text-on-inverse: #eef1f8;
   color-scheme: light;
+
+  /* The flat mandala's palette. It is the same object as the WebGL one — it
+     holds the frame until the canvas reports its first drawn frame, and stays
+     for good without WebGL — so it tracks the ground for the same reasons the
+     3D scene does: deeper and more saturated against white, brighter against
+     nila. Kept here rather than in the component so the two grounds sit
+     side by side and can be compared. */
+  --mandala-petal-top: #f9a13a;
+  --mandala-petal-bottom: #d1540a;
+  --mandala-gold-top: #f0d49a;
+  --mandala-gold-bottom: #b8842c;
+  --mandala-metal: #d9a33c;
 }
 
-/* Dark is driven by the reader's system setting only — one mechanism, so the
-   semantic tokens below and Tailwind's `dark:` utilities can never disagree. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: var(--color-navy-950);
-    --surface-raised: #0b1a30;
-    --surface-sunken: #050e1c;
-    --surface-inverse: #0b1a30;
-    --border-subtle: #172a45;
-    --border-strong: #22395a;
-    --text-primary: var(--color-sand-100);
-    --text-secondary: var(--color-navy-200);
-    --text-muted: #8ba2c0;
-    --text-on-inverse: var(--color-sand-100);
-    color-scheme: dark;
-  }
+/* The other ground: the same palette after dark. It reads as the deep blue of
+   the tradition, never as grey. Applied by attribute, so the header toggle and
+   the reader's system preference both resolve to the same one switch. */
+:root[data-theme="dark"] {
+  --surface: #080f24;
+  --surface-raised: #0e1733;
+  --surface-sunken: #050a1a;
+  --surface-inverse: #0e1733;
+  --border-subtle: #1b2648;
+  --border-strong: #27345c;
+  --text-primary: #eef1f8;
+  --text-secondary: #b3c0dd;
+  --text-muted: #8592b4;
+  --text-on-inverse: #eef1f8;
+  color-scheme: dark;
+
+  --mandala-petal-top: #fcbe71;
+  --mandala-petal-bottom: #e26108;
+  --mandala-gold-top: #f6e3b4;
+  --mandala-gold-bottom: #c9953a;
+  --mandala-metal: #e0b155;
+}
+
+/* Only across a switch do colours animate. Left on permanently this would fight
+   every hover state on the page, so the attribute is set for one beat by the
+   toggle and then removed. Transform and opacity are left alone, so nothing
+   that was already moving is slowed down. */
+:root[data-theme-changing],
+:root[data-theme-changing] *,
+:root[data-theme-changing] *::before,
+:root[data-theme-changing] *::after {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease,
+    fill 300ms ease,
+    stroke 300ms ease !important;
 }
 
 @theme inline {
@@ -149,10 +229,17 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
+  }
+
+  /* Cormorant runs light and small; display headings get the weight and
+     size back so they hold their own against the body text. */
+  h1,
+  h2 {
+    font-weight: 600;
   }
 
   p {
@@ -171,6 +258,64 @@
   }
 }
 
+/* ── scrollbars ──────────────────────────────────────────────
+   A native bar is a grey slab from outside the palette; on a warm
+   white page or a nila one it reads as a seam. These are the same
+   neutrals as the borders, drawn thin, on a track that is simply
+   whatever sits underneath — so a scrolling panel still reads as
+   one object. Firefox takes the two standard properties, WebKit
+   the pseudo-elements, with the same values behind both.
+
+   Unlayered on purpose: a scrollbar is chrome, not a utility, and
+   nothing should be able to win against it by specificity. */
+
+:root {
+  --scrollbar-thumb: #ded8cd;
+  --scrollbar-thumb-hover: #bdb4a6;
+}
+
+:root[data-theme="dark"] {
+  --scrollbar-thumb: #223057;
+  --scrollbar-thumb-hover: #35457a;
+}
+
+/* The navy rail is darker than either ground, so its bar has to be
+   light. `scrollbar-color` inherits, so setting the variables on the
+   scroller is enough — both engines pick them up. */
+.scrollbar-on-dark {
+  --scrollbar-thumb: rgb(255 255 255 / 0.16);
+  --scrollbar-thumb-hover: rgb(255 255 255 / 0.3);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* The transparent border plus `content-box` clipping is what gives the
+   thumb its breathing room — a 4px bar centred in a 10px gutter,
+   rather than a 10px bar hard against the edge. */
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
 /* ── components ──────────────────────────────────────────────── */
 
 @layer components {
@@ -187,44 +332,186 @@
     }
   }
 
-  /* Small uppercase label above a section heading. */
+  /* ── the editorial layer ─────────────────────────────────────
+     The page is set, not assembled. Things are separated by rules and
+     by space rather than by boxes with fills and shadows, headings are
+     serif and sized against the text under them, and the saffron is
+     spent on the few places a reader can act rather than on every
+     label. What follows is the small vocabulary that gets us that.
+     ──────────────────────────────────────────────────────────── */
+
+  /* The standing head above a section: a strap of small letterspaced
+     capitals, set in the sans so it reads as apparatus rather than as
+     part of the prose. Grey, not saffron — a label is not an action. */
   .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: block;
+    font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-flame-600);
+    color: var(--text-muted);
   }
 
+  /* A run of entries divided by hairlines, the way a contents page or a
+     bibliography divides them. No fills, no rounding, no shadow — the
+     rule alone says where one item ends and the next begins. */
+  .rule-list > * + * {
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* Kept for the handful of places that genuinely enclose something (a
+     figure, a form panel). A hairline and nothing else: no fill against
+     the page, no shadow, and a radius small enough to read as a cut
+     edge rather than a rounded UI tile. */
   .card {
-    background-color: var(--surface-raised);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
     overflow: hidden;
-    transition:
-      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.35s ease;
+    transition: border-color 0.25s ease;
   }
 
+  /* Hover moves ink, never geometry. Nothing on this site lifts off the
+     page or grows when a pointer crosses it. */
   .card-interactive:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lift);
     border-color: var(--border-strong);
   }
 
-  /* Decorative hairline used under section headings. */
+  /* The rule under a section head, full measure. Thicker than a divider
+     hairline so a section opening is legible as one when scanning. */
   .rule-accent::after {
     content: "";
     display: block;
-    width: 3rem;
-    height: 2px;
+    width: 100%;
+    height: 1px;
     margin-top: 0.875rem;
-    background: linear-gradient(90deg, var(--color-flame-500), transparent);
+    background: var(--border-strong);
   }
+
+  /* A link in running text, and the standard for every "read on" in the
+     apparatus: underlined at rest — an underline is what a link has
+     looked like for thirty years — and saffron when pointed at. */
+  .link-rule {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    text-decoration-color: var(--border-strong);
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+
+  .link-rule:hover {
+    color: var(--color-flame-700);
+    text-decoration-color: var(--color-flame-500);
+  }
+
+  :root[data-theme="dark"] .link-rule:hover {
+    color: var(--color-flame-300);
+  }
+
+  /* Figures — old numerals in the margin of an index row, durations,
+     page counts. Tabular so a column of them lines up. */
+  .figure-margin {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  /* ── Nepali / spiritual ornament ─────────────────────────────
+     Three motifs, used sparingly:
+       .mandala-field  a barely-there radial geometry behind a section
+       .ornament-rule  a divider with a lotus diamond at its centre
+       .torana         the temple-arch top edge on inverted bands
+     ──────────────────────────────────────────────────────────── */
+
+  /* Concentric rings plus radial spokes — a mandala reduced until it is
+     texture rather than picture. Sits at 3% so it never fights the text. */
+  .mandala-field::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-radial-gradient(
+        circle at 50% 50%,
+        currentColor 0 1px,
+        transparent 1px 46px
+      ),
+      repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        currentColor 0deg 0.35deg,
+        transparent 0.35deg 15deg
+      );
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 72%);
+    opacity: 0.05;
+  }
+
+  /* A hairline of light on a dark ground reads fainter than the same hairline
+     of dark on white, so it is given back a little. */
+  :root[data-theme="dark"] .mandala-field::before {
+    opacity: 0.09;
+  }
+
+  .ornament-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--color-gold-400);
+  }
+
+  .ornament-rule::before,
+  .ornament-rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+  }
+
+  /* The pointed arch over a temple doorway, drawn as a mask on the top
+     edge of a band so the band appears to sit under an arch. */
+  .torana-top {
+    -webkit-mask-image: radial-gradient(
+        22rem 4rem at 50% 0,
+        transparent 0 99%,
+        #000 100%
+      ),
+      linear-gradient(#000, #000);
+    -webkit-mask-composite: source-in;
+    mask-image: radial-gradient(22rem 4rem at 50% 0, transparent 0 99%, #000 100%),
+      linear-gradient(#000, #000);
+    mask-composite: intersect;
+  }
+
+  /* Devanagari set in the display serif, for the few places the site
+     speaks Nepali. Larger than latin at the same nominal size. */
+  .devanagari {
+    font-family: var(--font-devanagari);
+    line-height: 1.7;
+  }
+}
+
+/* ── the CMS body editor ─────────────────────────────────────
+   Shares `.prose-content` so what an editor types looks like what a
+   reader gets, with only the affordances a live editor needs added. */
+
+.admin-editor:empty::before,
+.admin-editor:has(> p:only-child:empty)::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* The editor is a fixed-height box, unlike an article page. */
+.admin-editor {
+  font-size: 1rem;
+  overflow-y: auto;
+}
+
+.admin-editor:focus {
+  outline: none;
 }
 
 /* ── long-form rich text (sanitised HTML from the CMS) ───────── */
@@ -233,6 +520,7 @@
   font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--text-primary);
+  font-family: var(--font-serif);
 }
 
 .prose-content > * + * {
@@ -249,13 +537,13 @@
 }
 
 .prose-content h2 {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
 }
 .prose-content h3 {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 }
 .prose-content h4 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .prose-content a {
@@ -270,10 +558,26 @@
   text-decoration-color: var(--color-flame-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  .prose-content a {
-    color: var(--color-flame-300);
-  }
+:root[data-theme="dark"] .prose-content a {
+  color: var(--color-flame-300);
+}
+
+:root[data-theme="dark"] .prose-content a:hover {
+  text-decoration-color: var(--color-flame-400);
+}
+
+/* Saffron at 200 is a light-ground colour; on the dark ground the selection
+   needs the deeper end of the ramp to keep the text on it readable. */
+:root[data-theme="dark"] ::selection {
+  background-color: var(--color-flame-700);
+  color: #ffffff;
+}
+
+/* The code block is already the darkest thing on a white page. On the dark
+   ground it has to separate from the surface instead of matching it. */
+:root[data-theme="dark"] .prose-content pre {
+  background: #060d1f;
+  border: 1px solid var(--border-subtle);
 }
 
 .prose-content strong {
@@ -299,10 +603,10 @@
 }
 
 .prose-content blockquote {
-  border-left: 3px solid var(--color-flame-400);
+  border-left: 3px solid var(--color-gold-400);
   padding: 0.25rem 0 0.25rem 1.25rem;
-  font-family: var(--font-serif);
-  font-size: 1.15em;
+  font-family: var(--font-display);
+  font-size: 1.3em;
   font-style: italic;
   color: var(--text-secondary);
 }
@@ -328,6 +632,7 @@
   overflow-x: auto;
   font-size: 0.875rem;
   line-height: 1.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .prose-content :not(pre) > code {
@@ -336,6 +641,7 @@
   padding: 0.12em 0.4em;
   border-radius: 0.35rem;
   font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 /* Tables can be wider than the column — let them scroll, never the page. */
@@ -349,6 +655,7 @@
 .prose-content table {
   border-collapse: collapse;
   font-size: 0.9375rem;
+  font-family: var(--font-sans);
 }
 
 .prose-content th,

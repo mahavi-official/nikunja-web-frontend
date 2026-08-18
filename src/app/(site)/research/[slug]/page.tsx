@@ -91,7 +91,7 @@ export default async function ResearchDetailPage({ params }: { params: Params })
             <Breadcrumbs trail={trail} />
 
             <div className="grid gap-10 lg:grid-cols-12">
-              <div className="lg:col-span-8">
+              <div className="min-w-0 lg:col-span-8">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="navy">Research</Badge>
                   {research.category ? (
@@ -135,7 +135,7 @@ export default async function ResearchDetailPage({ params }: { params: Params })
               </div>
 
               {research.ogImage ? (
-                <div className="lg:col-span-4">
+                <div className="min-w-0 lg:col-span-4">
                   <div className="relative aspect-4/3 overflow-hidden rounded-[var(--radius-card)] bg-surface-sunken">
                     <CoverImage
                       media={research.ogImage}
@@ -152,7 +152,10 @@ export default async function ResearchDetailPage({ params }: { params: Params })
         </header>
 
         <div className="container-page grid gap-12 py-10 md:py-14 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+          {/* `min-w-0` — a grid item's automatic minimum is its content, so a
+              long filename or an unwrappable button in here would widen the
+              track past the viewport instead of wrapping. */}
+          <div className="min-w-0 lg:col-span-8">
             <h2 className="text-lg">Abstract</h2>
             <p className="mt-4 text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-soft">
               {research.abstract}
@@ -199,7 +202,7 @@ export default async function ResearchDetailPage({ params }: { params: Params })
           </div>
 
           {/* Citation rail */}
-          <aside className="lg:col-span-4">
+          <aside className="min-w-0 lg:col-span-4">
             <div className="sticky top-24 rounded-[var(--radius-card)] border border-line bg-surface-raised p-6">
               <h2 className="text-base">Publication details</h2>
               <dl className="mt-4">

@@ -9,6 +9,7 @@ const API_ORIGIN = (process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_
 const remotePatterns = [
   { protocol: "https", hostname: "i.ytimg.com" },
   { protocol: "https", hostname: "img.youtube.com" },
+  { protocol: "https", hostname: "picsum.photos" },
 ];
 
 const cdn = process.env.NEXT_PUBLIC_CDN_URL;

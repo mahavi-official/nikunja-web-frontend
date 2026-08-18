@@ -88,7 +88,7 @@ export default async function ResearchPage({ searchParams }: { searchParams: Sea
             href={withParams({ year: undefined })}
             className={cn(
               "rounded-full px-3 py-1 text-sm transition-colors",
-              !year ? "bg-navy-800 text-white" : "text-ink-soft hover:bg-surface-sunken"
+              !year ? "bg-navy-800 text-white dark:bg-navy-600" : "text-ink-soft hover:bg-surface-sunken"
             )}
           >
             Any
@@ -99,7 +99,7 @@ export default async function ResearchPage({ searchParams }: { searchParams: Sea
               href={withParams({ year: String(candidate) })}
               className={cn(
                 "rounded-full px-3 py-1 text-sm tabular-nums transition-colors",
-                year === candidate ? "bg-navy-800 text-white" : "text-ink-soft hover:bg-surface-sunken"
+                year === candidate ? "bg-navy-800 text-white dark:bg-navy-600" : "text-ink-soft hover:bg-surface-sunken"
               )}
             >
               {candidate}

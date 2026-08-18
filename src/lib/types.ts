@@ -150,6 +150,13 @@ export interface Post {
   noIndex: boolean;
   createdAt: string;
   updatedAt: string;
+  /**
+   * Only the admin endpoints return these — the public projection strips the
+   * raw meta fields because it sends a fully resolved `Seo` object instead.
+   */
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  canonicalUrl?: string | null;
   author: PostAuthor;
   coverImage: Media | null;
   ogImage: Media | null;
@@ -219,6 +226,9 @@ export interface Research {
   noIndex: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Admin projection only — see the note on `Post`. */
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   category?: Category | null;
   ogImage?: Media | null;
   authors: ResearchAuthorLink[];

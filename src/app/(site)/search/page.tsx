@@ -74,7 +74,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
                 type="search"
                 defaultValue={query}
                 placeholder="Papers, articles, talks…"
-                className="h-13 flex-1 bg-transparent text-base outline-none placeholder:text-ink-muted"
+                /* `min-w-0` because an input's intrinsic width is its default
+                   size in characters — without it the field refuses to shrink
+                   and pushes the submit button off a narrow phone. */
+                className="h-13 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-ink-muted"
               />
               {type !== "all" ? <input type="hidden" name="type" value={type} /> : null}
               <button
@@ -94,7 +97,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
                 className={cn(
                   "rounded-full px-3.5 py-1.5 text-sm transition-colors",
                   option.value === type
-                    ? "bg-navy-800 text-white"
+                    ? "bg-navy-800 text-white dark:bg-navy-600"
                     : "text-ink-soft hover:bg-surface-sunken"
                 )}
               >
