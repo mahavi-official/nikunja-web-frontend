@@ -165,10 +165,6 @@ export async function Footer() {
           <p>
             © {year} {value(settings, "site.title") ?? "Radhakundah"}. All rights reserved.
           </p>
-          <p>
-            Built by{" "}
-            <span className="text-sand-200/80">Mahavi Pvt Ltd</span> for Nikunja Seva Pty Ltd
-          </p>
         </div>
       </div>
     </footer>

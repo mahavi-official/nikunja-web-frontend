@@ -124,10 +124,11 @@ function UsersList() {
     setFormError(null);
 
     try {
-      // The API accepts only name and module grants here — a role change is
-      // not offered, and email is the account's identity.
+      // Email is the account's identity and cannot be changed here, but name,
+      // role, and editor module grants can be.
       await api.patch(`/admin/users/${editing.id}`, {
         name: form.name.trim(),
+        role: form.role,
         editorModules: form.role === "EDITOR" ? form.editorModules : [],
       });
       notify("User updated.");
@@ -171,12 +172,14 @@ function UsersList() {
   /** A protected super admin, or yourself: neither can be locked out here. */
   const isLocked = (user: AdminUser) => user.isProtected || user.id === viewer?.id;
 
+  /** Editing a user's role/name/modules is a super admin-only action. */
+  const canEdit = isSuperAdmin(viewer);
+
   const roleField = (
     <>
       <Field label="Role">
         <Select
           value={form.role}
-          disabled={!!editing}
           onChange={(event) => setForm({ ...form, role: event.target.value as Role })}
         >
           {ROLES.filter(
@@ -295,7 +298,13 @@ function UsersList() {
                           </span>
                         ) : (
                           <>
-                            <AdminButton tone="secondary" size="sm" onClick={() => openEdit(user)}>
+                            <AdminButton
+                              tone="secondary"
+                              size="sm"
+                              onClick={() => openEdit(user)}
+                              disabled={!canEdit}
+                              title={canEdit ? undefined : "Only a super admin can edit users"}
+                            >
                               Edit
                             </AdminButton>
                             <button

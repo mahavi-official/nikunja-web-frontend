@@ -1,14 +1,14 @@
 import { ExternalLink, MapPin } from "lucide-react";
 
 /**
- * Sydney Opera House — the default pin until the CMS supplies coordinates
- * under `contact.mapLat` / `contact.mapLng`.
+ * The default pin until the CMS supplies coordinates under `contact.mapLat` /
+ * `contact.mapLng`.
  */
 const DEFAULT_PLACE = {
-  lat: -33.856784,
-  lng: 151.215297,
-  label: "Sydney Opera House",
-  area: "Bennelong Point, Sydney NSW 2000, Australia",
+  lat: 27.6913333,
+  lng: 85.2812778,
+  label: "Nagarjun-10, Kathmandu",
+  area: "Nagarjun-10, Nagarjun Municipality, Kathmandu District, Bagmati Province 44618, Nepal",
 };
 
 /** Roughly a 1.3 km × 0.9 km window around the pin — close enough to read street names. */
