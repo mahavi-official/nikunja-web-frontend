@@ -128,6 +128,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <JsonLd data={siteJsonLd(settings)} />
       </head>
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
+        {/* The logo file (radhakunda_logo.jpeg) is a raster asset from the
+            source artwork, on its own opaque black ground. Rather than editing
+            that file, this filter keys the black out to transparent at render
+            time — alpha is driven by pixel luminance, so the black ground
+            drops out cleanly while the navy/orange mark stays fully opaque. */}
+        <svg aria-hidden focusable="false" className="absolute size-0 overflow-hidden">
+          <filter id="logo-mark-alpha" colorInterpolationFilters="sRGB">
+            <feColorMatrix
+              type="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.4882 5.0064 0.5054 0 -0.03"
+            />
+          </filter>
+        </svg>
+
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

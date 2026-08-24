@@ -3,9 +3,10 @@ import Image from "next/image";
 import { cn } from "@/lib/format";
 
 /**
- * The brand mark, served as a raster tile. The artwork carries its own dark
- * ground, so it is rounded and clipped rather than dropped straight onto the
- * page — a bare square would read as a hole in the light header.
+ * The brand mark, served as a raster tile. The source file sits on its own
+ * opaque black ground; `logo-mark-alpha` (defined once in the root layout)
+ * keys that black out to transparent at render time, so the mark drops onto
+ * the page without a dark square around it.
  */
 /* The size is a default rather than a merged-in base class: `cn` only joins,
    so a `size-*` passed by a caller would lose to a hardcoded one here on
@@ -25,9 +26,10 @@ export function LogoMark({
       width={1280}
       height={1280}
       priority={priority}
+      style={{ filter: "url(#logo-mark-alpha)" }}
       /* The intrinsic size above is only the aspect hint for the optimiser;
          the `size-*` class is what actually lays the mark out. */
-      className={cn("rounded-lg object-cover", className)}
+      className={cn("object-contain", className)}
     />
   );
 }
