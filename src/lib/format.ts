@@ -88,9 +88,17 @@ export function truncate(text: string, length = 160): string {
   return `${clean.slice(0, clean.lastIndexOf(" ", length) || length)}…`;
 }
 
+/** A variant slot only counts if it holds something the browser can fetch. */
+function asUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return /^(https?:)?\/\/|^\/|^data:/.test(value) ? value : null;
+}
+
 /**
  * Picks a pre-generated derivative rather than the original. Sizes are made at
  * upload time by sharp, so the browser never downloads a 4MB JPEG for a card.
+ * Falls back to the original whenever a slot is empty or holds anything that
+ * is not a URL — next/image throws on a src it cannot parse.
  */
 export function mediaUrl(
   media: Media | null | undefined,
@@ -98,7 +106,7 @@ export function mediaUrl(
 ): string | null {
   if (!media) return null;
   const variant = media.variants?.[size];
-  return variant?.webp || variant?.original || media.url || null;
+  return asUrl(variant?.webp) || asUrl(variant?.original) || media.url || null;
 }
 
 export function mediaAlt(media: Media | null | undefined, fallback: string): string {

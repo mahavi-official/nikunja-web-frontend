@@ -5,8 +5,9 @@ import { ListingShell } from "@/components/listing/ListingShell";
 import { PostCard, ResearchCard } from "@/components/cards";
 import { EmptyState, JsonLd, Pagination } from "@/components/ui/primitives";
 
-export const revalidate = 60;
-export const dynamicParams = true;
+// Reads `searchParams` for pagination, so it can never be prerendered — no
+// `generateStaticParams` here, or Next tries to serve it from the ISR cache.
+export const dynamic = "force-dynamic";
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -30,11 +31,6 @@ async function loadTag(slug: string, page: number) {
     posts,
     research: research.research,
   };
-}
-
-export async function generateStaticParams() {
-  const tags = await getTags(50);
-  return tags.map((tag) => ({ slug: tag.slug }));
 }
 
 export async function generateMetadata({

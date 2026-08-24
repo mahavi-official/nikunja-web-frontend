@@ -3,8 +3,9 @@ import { getCategories, listPosts } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/seo";
 import { PostListingView } from "@/components/listing/PostListingView";
 
-export const revalidate = 60;
-export const dynamicParams = true;
+// Reads `searchParams` for pagination, so it can never be prerendered — no
+// `generateStaticParams` here, or Next tries to serve it from the ISR cache.
+export const dynamic = "force-dynamic";
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -12,11 +13,6 @@ type SearchParams = Promise<{ page?: string }>;
 function pageNumber(value?: string) {
   const parsed = Number(value ?? 1);
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
-}
-
-export async function generateStaticParams() {
-  const categories = await getCategories("ARTICLE");
-  return categories.map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({
