@@ -176,7 +176,7 @@ function Moderation() {
                   </span>
                 </div>
 
-                <p className="mt-2.5 text-sm leading-relaxed whitespace-pre-wrap text-ink-soft">
+                <p className="mt-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words text-ink-soft">
                   {comment.body}
                 </p>
               </li>

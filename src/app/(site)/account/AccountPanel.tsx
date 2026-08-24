@@ -85,10 +85,10 @@ export function AccountPanel() {
   }
 
   return (
-    <div className="mt-10 grid gap-8 lg:grid-cols-12">
-      <section className="lg:col-span-5">
+    <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-12">
+      <section className="min-w-0 lg:col-span-5">
         <h2 className="text-lg">Profile</h2>
-        <dl className="mt-4 rounded-[var(--radius-card)] border border-line bg-surface-raised p-6">
+        <dl className="mt-4 rounded-[var(--radius-card)] border border-line bg-surface-raised p-4 sm:p-6">
           <Row label="Name">{user.name}</Row>
           <Row label="Email">{user.email}</Row>
           <Row label="Role">{user.role.replace("_", " ").toLowerCase()}</Row>
@@ -100,7 +100,7 @@ export function AccountPanel() {
         </Button>
       </section>
 
-      <section className="lg:col-span-7">
+      <section className="min-w-0 lg:col-span-7">
         <h2 className="text-lg">Active sessions</h2>
         <p className="mt-1 text-sm text-ink-muted">
           Each sign-in creates a session that lasts 30 days. Ending one signs that device out

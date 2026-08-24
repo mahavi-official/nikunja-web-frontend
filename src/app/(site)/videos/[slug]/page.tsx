@@ -62,7 +62,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <Breadcrumbs trail={trail} />
 
         <div className="grid gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+          <div className="min-w-0 lg:col-span-8">
             <YouTubeEmbed
               youtubeId={video.youtubeId}
               title={video.title}
@@ -103,7 +103,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             </div>
           </div>
 
-          <aside className="lg:col-span-4">
+          <aside className="min-w-0 lg:col-span-4">
             <h2 className="text-lg">Up next</h2>
             <ul className="mt-5 space-y-5">
               {related.videos

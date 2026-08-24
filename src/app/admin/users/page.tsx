@@ -38,11 +38,15 @@ import type { Role } from "@/lib/types";
  * an email and a role but never a password — there are none anywhere.
  */
 
+/**
+ * `SUPER_ADMIN` is deliberately absent: it is a singleton bound to
+ * `SUPER_ADMIN_EMAIL` and reasserted at boot, never assignable through this
+ * screen. The API rejects it too (400) if it's ever sent.
+ */
 const ROLES: { value: Role; label: string; note: string }[] = [
   { value: "MEMBER", label: "Member", note: "Reads, comments, and opens gated PDFs." },
   { value: "EDITOR", label: "Editor", note: "Edits only the modules granted below." },
   { value: "ADMIN", label: "Admin", note: "Everything except settings and redirects." },
-  { value: "SUPER_ADMIN", label: "Super admin", note: "Everything, including site settings." },
 ];
 
 export default function UsersPage() {
@@ -182,10 +186,7 @@ function UsersList() {
           value={form.role}
           onChange={(event) => setForm({ ...form, role: event.target.value as Role })}
         >
-          {ROLES.filter(
-            // Only a super admin can mint another one.
-            (role) => role.value !== "SUPER_ADMIN" || isSuperAdmin(viewer)
-          ).map((role) => (
+          {ROLES.map((role) => (
             <option key={role.value} value={role.value}>
               {role.label}
             </option>

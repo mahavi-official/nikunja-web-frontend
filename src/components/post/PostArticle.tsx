@@ -128,11 +128,11 @@ export function PostArticle({
               <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy-800 text-lg font-semibold text-white dark:bg-navy-600">
                 {post.author.name.charAt(0)}
               </span>
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs font-semibold tracking-wider text-ink-muted uppercase">
                   Written by
                 </p>
-                <p className="mt-1 font-serif text-lg font-semibold">{post.author.name}</p>
+                <p className="mt-1 font-serif text-lg font-semibold break-words">{post.author.name}</p>
               </div>
             </aside>
 

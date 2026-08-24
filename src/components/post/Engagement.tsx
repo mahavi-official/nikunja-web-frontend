@@ -186,7 +186,7 @@ export function Engagement({
                     </button>
                   ) : null}
                 </div>
-                <p className="mt-1.5 text-[0.9375rem] leading-relaxed whitespace-pre-line text-ink-soft">
+                <p className="mt-1.5 text-[0.9375rem] leading-relaxed whitespace-pre-line break-words text-ink-soft">
                   {comment.body}
                 </p>
               </div>
