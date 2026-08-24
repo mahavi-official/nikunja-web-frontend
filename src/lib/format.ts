@@ -88,9 +88,97 @@ export function truncate(text: string, length = 160): string {
   return `${clean.slice(0, clean.lastIndexOf(" ", length) || length)}…`;
 }
 
+/** The one origin public media is served from. Mirrors next.config.mjs. */
+export const MEDIA_ORIGIN = (
+  process.env.NEXT_PUBLIC_CDN_URL || "https://radhakundah.blob.core.windows.net"
+).replace(/\/+$/, "");
+
+/** The public container inside the storage account. Every key lives under it. */
+export const MEDIA_CONTAINER = "media";
+
+const isBlobHost = (host: string) => /\.blob\.core\.windows\.net$/i.test(host);
+
 /**
- * Picks a pre-generated derivative rather than the original. Sizes are made at
- * upload time by sharp, so the browser never downloads a 4MB JPEG for a card.
+ * True when a stored value is a *reference* to an image — a URL or a storage
+ * key — rather than the image itself.
+ *
+ * The API fills `variants` with base64-encoded bytes from sharp instead of
+ * uploading the derivatives and storing their URLs, so a variant slot usually
+ * holds a whole WebP file. Putting that in an `src` yields a request for
+ * `…/media/UklGRkIqAABXRUJQ…`, which is what broke the gallery. Keys are short
+ * and end in an image extension; encoded bytes are neither.
+ */
+function isMediaRef(value: string | null | undefined): value is string {
+  const raw = value?.trim();
+  if (!raw) return false;
+  // A proper data URI is self-describing and renders as-is, unlike the bare
+  // base64 in `variants`.
+  if (/^data:image\//i.test(raw)) return true;
+  // Longer than any real key or signed URL, so it can only be a payload.
+  if (raw.length > 1024) return false;
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return true;
+  return /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(raw.split(/[?#]/)[0]);
+}
+
+// Straight at blob storage the container is part of the path. A CDN in front
+// of it is already pointed at that container, so its origin is the whole base.
+const MEDIA_BASE = isBlobHost(new URL(MEDIA_ORIGIN).hostname)
+  ? `${MEDIA_ORIGIN}/${MEDIA_CONTAINER}`
+  : MEDIA_ORIGIN;
+
+/**
+ * Pins a stored URL to `<origin>/media/<key>`.
+ *
+ * Records written by older uploaders carry the wrong shape — a stale storage
+ * account, or the container segment missing entirely
+ * (`https://…blob.core.windows.net/<key>.jpg`), which 404s. Rather than trust
+ * whatever the API hands us, we keep the key and rebuild the rest. Anything
+ * that is not blob storage (YouTube thumbnails, the API's own dev uploads,
+ * data URIs) is left untouched.
+ */
+export function normalizeMediaUrl(url: string | null | undefined): string | null {
+  const raw = url?.trim();
+  if (!raw) return null;
+
+  // Never let image bytes masquerade as a key and get a base URL glued on.
+  if (!isMediaRef(raw)) return null;
+
+  // Already carries its own bytes.
+  if (/^data:/i.test(raw)) return raw;
+
+  // Root-relative paths are served by the site or the API in dev — not ours.
+  if (raw.startsWith("/")) return raw;
+
+  // Bare storage key straight out of the database.
+  if (!/^https?:\/\//i.test(raw)) return `${MEDIA_BASE}/${raw}`;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return raw;
+  }
+
+  if (!isBlobHost(parsed.hostname)) return raw;
+
+  // Drop the container if it is already there, so we never double it up.
+  const key = parsed.pathname
+    .replace(/^\/+/, "")
+    .replace(new RegExp(`^${MEDIA_CONTAINER}/`, "i"), "");
+  if (!key) return raw;
+
+  return `${MEDIA_BASE}/${key}${parsed.search}`;
+}
+
+/**
+ * Prefers a pre-generated derivative over the original, so the browser never
+ * downloads a 4MB JPEG for a card.
+ *
+ * A variant counts only when it actually points at one. Today the API stores
+ * sharp's output as base64 in `variants` rather than uploading it, so every
+ * slot fails that test and we fall back to the uploaded original — correct,
+ * just heavier than it should be. Once the API stores derivative URLs this
+ * starts preferring them with no change here.
  */
 export function mediaUrl(
   media: Media | null | undefined,
@@ -98,7 +186,39 @@ export function mediaUrl(
 ): string | null {
   if (!media) return null;
   const variant = media.variants?.[size];
-  return variant?.webp || variant?.original || media.url || null;
+  const ref = [variant?.webp, variant?.original].find(isMediaRef);
+  return normalizeMediaUrl(ref ?? media.url);
+}
+
+/**
+ * Runs every `<img src>` in stored HTML through the same pinning.
+ *
+ * Post bodies are written by the admin editor, so they keep whatever URL shape
+ * was current when they were saved — a stale storage account, a missing
+ * container, or base64 the editor baked straight into the markup. An image we
+ * cannot resolve is dropped, since a broken box is worse than a gap.
+ */
+export function normalizeMediaHtml(html: string | null | undefined): string {
+  if (!html) return "";
+
+  return html.replace(/<img\b[^>]*>/gi, (tag) => {
+    const attr = /\ssrc\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(tag);
+    const value = attr?.[1] ?? attr?.[2];
+    if (!attr || !value) return tag;
+
+    const url = normalizeMediaUrl(decodeHtml(value));
+    if (!url) return "";
+    return tag.replace(attr[0], ` src="${url.replace(/"/g, "&quot;")}"`);
+  });
+}
+
+function decodeHtml(value: string): string {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
 }
 
 export function mediaAlt(media: Media | null | undefined, fallback: string): string {
