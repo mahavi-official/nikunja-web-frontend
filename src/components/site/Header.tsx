@@ -101,7 +101,7 @@ export function Header() {
       >
         <div className="container-page flex h-18 items-center justify-between gap-4">
           <Link href="/" aria-label="Radhakundah — home" className="shrink-0">
-            <Logo />
+            <Logo priority />
           </Link>
 
           <nav aria-label="Primary" className="hidden lg:block">

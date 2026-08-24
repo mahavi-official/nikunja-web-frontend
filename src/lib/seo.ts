@@ -133,7 +133,7 @@ export function siteJsonLd(settings: Settings): Record<string, unknown>[] {
       "@type": "Organization",
       name: siteName,
       url: SITE_URL,
-      logo: absoluteUrl("/logo.png"),
+      logo: absoluteUrl("/radhakunda_logo.jpeg"),
       ...(sameAs.length ? { sameAs } : {}),
       ...(settings["contact.email"]
         ? {

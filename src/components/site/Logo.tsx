@@ -1,44 +1,45 @@
+import Image from "next/image";
+
 import { cn } from "@/lib/format";
 
 /**
- * The mark reads as a kunda — still water in a ring of steps — with the sun
- * over it. Navy for the ring, orange for the sun: the two logo colours, doing
- * one job each.
+ * The brand mark, served as a raster tile. The artwork carries its own dark
+ * ground, so it is rounded and clipped rather than dropped straight onto the
+ * page — a bare square would read as a hole in the light header.
  */
 /* The size is a default rather than a merged-in base class: `cn` only joins,
    so a `size-*` passed by a caller would lose to a hardcoded one here on
    stylesheet order rather than on the order the two are written. */
-export function LogoMark({ className = "size-9" }: { className?: string }) {
+export function LogoMark({
+  className = "size-9",
+  priority = false,
+}: {
+  className?: string;
+  priority?: boolean;
+}) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false">
-      {/* Lifted a step in dark mode so the ring does not sink into the page. */}
-      <circle cx="20" cy="20" r="19" className="fill-navy-900 dark:fill-navy-700" />
-      <circle cx="20" cy="16.5" r="5.25" className="fill-flame-500" />
-      <path
-        d="M7 25.5h26M9.5 29.5h21M13 33.5h14"
-        className="stroke-sand-100"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        opacity="0.9"
-      />
-      <path
-        d="M20 27.5c-4.5 0-7.5-2.6-7.5-2.6"
-        className="stroke-flame-400"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.7"
-      />
-    </svg>
+    <Image
+      src="/radhakunda_logo.jpeg"
+      alt=""
+      aria-hidden
+      width={1280}
+      height={1280}
+      priority={priority}
+      /* The intrinsic size above is only the aspect hint for the optimiser;
+         the `size-*` class is what actually lays the mark out. */
+      className={cn("rounded-lg object-cover", className)}
+    />
   );
 }
 
 export function Logo({
   className,
   tone = "default",
+  priority = false,
 }: {
   className?: string;
   tone?: "default" | "inverse";
+  priority?: boolean;
 }) {
   return (
     /* The strap under the name is set wide, which makes the lockup the widest
@@ -46,7 +47,7 @@ export function Logo({
        the header still fits beside the controls rather than pushing the page
        sideways. */
     <span className={cn("inline-flex items-center gap-2 sm:gap-2.5", className)}>
-      <LogoMark className="size-8 shrink-0 sm:size-9" />
+      <LogoMark className="size-8 shrink-0 sm:size-9" priority={priority} />
       <span className="flex flex-col leading-none">
         <span
           className={cn(

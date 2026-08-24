@@ -85,7 +85,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       images: [defaultOg],
     },
-    icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }] },
+    icons: { icon: [{ url: "/radhakunda_logo.jpeg", type: "image/jpeg" }] },
     manifest: "/manifest.webmanifest",
     formatDetection: { telephone: false },
   };
