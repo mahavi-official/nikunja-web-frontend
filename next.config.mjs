@@ -24,7 +24,11 @@ if (process.env.NEXT_PUBLIC_CDN_URL) mediaOrigins.add(process.env.NEXT_PUBLIC_CD
 for (const origin of mediaOrigins) {
   const { protocol, hostname } = new URL(origin);
   if (remotePatterns.some((pattern) => pattern.hostname === hostname)) continue;
-  remotePatterns.push({ protocol: protocol.replace(":", ""), hostname });
+  // Scope the blob account to its "media" container rather than the whole
+  // storage account; a CDN in front of it gets the same courtesy if it
+  // fronts a path rather than the bare origin.
+  const pathname = hostname === new URL(BLOB_ORIGIN).hostname ? "/media/**" : "/**";
+  remotePatterns.push({ protocol: protocol.replace(":", ""), hostname, pathname });
 }
 
 // Local development serves media straight off the API.
