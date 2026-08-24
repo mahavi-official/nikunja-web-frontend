@@ -3,8 +3,12 @@ import { getCategories, listPosts } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/seo";
 import { PostListingView } from "@/components/listing/PostListingView";
 
+// Paginated through `?page=`, so the render is always request-shaped. Listing
+// `generateStaticParams` here would ask Next to prerender these paths at build
+// time, and reading `searchParams` during that prerender throws
+// DYNAMIC_SERVER_USAGE — a 500 on every category page. `/blogs` takes the same
+// shape and deliberately declares neither.
 export const revalidate = 60;
-export const dynamicParams = true;
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -12,11 +16,6 @@ type SearchParams = Promise<{ page?: string }>;
 function pageNumber(value?: string) {
   const parsed = Number(value ?? 1);
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
-}
-
-export async function generateStaticParams() {
-  const categories = await getCategories("BLOG");
-  return categories.map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({

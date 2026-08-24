@@ -5,8 +5,12 @@ import { ListingShell } from "@/components/listing/ListingShell";
 import { PostCard, ResearchCard } from "@/components/cards";
 import { EmptyState, JsonLd, Pagination } from "@/components/ui/primitives";
 
+// Paginated through `?page=`, so the render is always request-shaped. Listing
+// `generateStaticParams` here would ask Next to prerender these paths at build
+// time, and reading `searchParams` during that prerender throws
+// DYNAMIC_SERVER_USAGE — a 500 on every tag page. `/articles` and `/research`
+// take the same shape and deliberately declare neither.
 export const revalidate = 60;
-export const dynamicParams = true;
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -30,11 +34,6 @@ async function loadTag(slug: string, page: number) {
     posts,
     research: research.research,
   };
-}
-
-export async function generateStaticParams() {
-  const tags = await getTags(50);
-  return tags.map((tag) => ({ slug: tag.slug }));
 }
 
 export async function generateMetadata({
