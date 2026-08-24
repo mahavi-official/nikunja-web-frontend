@@ -36,7 +36,7 @@ The backend must be running (`npm run dev` in `../NikunjaWebBackend`, on
 | `NEXT_PUBLIC_API_URL` | API origin as the **browser** sees it |
 | `API_INTERNAL_URL` | API origin as the **server** sees it (may be private) |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin; every absolute URL is built from it |
-| `NEXT_PUBLIC_CDN_URL` | Media CDN, added to `next/image` `remotePatterns` |
+| `NEXT_PUBLIC_CDN_URL` | Media origin (Azure Blob Storage, or a CDN in front of it), added to `next/image` `remotePatterns` |
 | `NEXT_PUBLIC_ENABLE_INDEXING` | `true` **only** on production |
 
 `NEXT_PUBLIC_ENABLE_INDEXING` is the single switch that keeps non-production

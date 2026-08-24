@@ -118,10 +118,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             ahead of the stylesheet and outside React's hydration. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
 
-        {/* Media comes off the CDN — warm the connection before first paint. */}
-        {process.env.NEXT_PUBLIC_CDN_URL ? (
-          <link rel="preconnect" href={process.env.NEXT_PUBLIC_CDN_URL} crossOrigin="" />
-        ) : null}
+        {/* Media comes off blob storage (or a CDN in front of it) — warm the
+            connection before first paint. */}
+        <link
+          rel="preconnect"
+          href={process.env.NEXT_PUBLIC_CDN_URL || "https://radhakundah.blob.core.windows.net"}
+          crossOrigin=""
+        />
         <JsonLd data={siteJsonLd(settings)} />
       </head>
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>

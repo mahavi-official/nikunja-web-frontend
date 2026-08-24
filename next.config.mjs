@@ -2,9 +2,15 @@
 
 const API_ORIGIN = (process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/$/, "");
 
+// Media lives in the "media" container of the Azure Blob Storage account, e.g.
+// https://radhakundah.blob.core.windows.net/media/<key>.jpg — the API hands us
+// absolute URLs on that host, so it must always be renderable.
+const BLOB_ORIGIN = "https://radhakundah.blob.core.windows.net";
+
 /**
- * Every remote host we are allowed to render images from. The CDN in front of
- * the public S3 bucket, plus YouTube's thumbnail hosts (videos are YouTube-only).
+ * Every remote host we are allowed to render images from. The blob account and
+ * whatever CDN sits in front of it, plus YouTube's thumbnail hosts (videos are
+ * YouTube-only).
  */
 const remotePatterns = [
   { protocol: "https", hostname: "i.ytimg.com" },
@@ -12,9 +18,12 @@ const remotePatterns = [
   { protocol: "https", hostname: "picsum.photos" },
 ];
 
-const cdn = process.env.NEXT_PUBLIC_CDN_URL;
-if (cdn) {
-  const { protocol, hostname } = new URL(cdn);
+const mediaOrigins = new Set([BLOB_ORIGIN]);
+if (process.env.NEXT_PUBLIC_CDN_URL) mediaOrigins.add(process.env.NEXT_PUBLIC_CDN_URL);
+
+for (const origin of mediaOrigins) {
+  const { protocol, hostname } = new URL(origin);
+  if (remotePatterns.some((pattern) => pattern.hostname === hostname)) continue;
   remotePatterns.push({ protocol: protocol.replace(":", ""), hostname });
 }
 
