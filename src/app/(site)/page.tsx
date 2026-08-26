@@ -67,10 +67,9 @@ export default async function HomePage() {
         <div className="container-page grid gap-10 py-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <p className="font-serif text-xl leading-relaxed text-ink md:text-2xl md:leading-[1.55]">
-              Radhakundah , located in Kathmandu, Nepal. , is a private research institution and 
-              think tank advancing disciplined inquiry across Nepal's wisdom, culture, and 
-              science - nurturing research at home, connecting scholarship worldwide, and decoding 
-              Nepal's potential for the world.
+              Radhakundah, located in Kathmandu, Nepal, is a private research institution and think 
+              tank advancing disciplined inquiry into Nepal’s wisdom, culture, and science—nurturing 
+              research at home, connecting scholarship worldwide, and decoding Nepal’s potential for the world.
             </p>
             <p className="mt-5 max-w-xl text-ink-soft">
               A reservoir of wisdom, poured out for the world.

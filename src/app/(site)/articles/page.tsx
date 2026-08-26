@@ -6,7 +6,7 @@ import { PostListingView } from "@/components/listing/PostListingView";
 export const revalidate = 60;
 
 const DESCRIPTION =
-  "Independent research and commentary on the questions that shape Nepal.";
+  "Independent research and commentary on the questions that shape our world.";
 
 type SearchParams = Promise<{ page?: string }>;
 
