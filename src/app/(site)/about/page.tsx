@@ -6,11 +6,12 @@ import type { AboutSections } from "@/lib/types";
 
 // Saving the page in admin clears this cache immediately (see
 // `app/api/revalidate`), so the window below is only the fallback for a
-// revalidation that never arrived. It matches the hour `getAboutPage()` caches
-// its fetch for — a shorter window here would only rebuild the page around the
-// same hour-old data.
+// revalidation that never arrived. It matches the window `getAboutPage()`
+// caches its fetch for — a shorter window here would only rebuild the page
+// around the same stale data.
 
-export const revalidate = 3600;
+// export const revalidate = 3600; // was 1 hour; capped to 5 min on 2026-08-26, see README caching table
+export const revalidate = 300;
 
 export async function generateMetadata() {
   try {

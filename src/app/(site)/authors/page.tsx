@@ -4,7 +4,8 @@ import { ListingShell } from "@/components/listing/ListingShell";
 import { AuthorCard } from "@/components/cards";
 import { EmptyState, JsonLd, Pagination } from "@/components/ui/primitives";
 
-export const revalidate = 3600;
+// export const revalidate = 3600; // was 1 hour; capped to 5 min on 2026-08-26, see README caching table
+export const revalidate = 300;
 
 type SearchParams = Promise<{ page?: string }>;
 

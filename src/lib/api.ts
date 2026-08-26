@@ -54,7 +54,8 @@ export const SITE_URL = (
 export const REVALIDATE = {
   listing: 60,
   detail: 300,
-  static: 3600,
+  // static: 3600, // was 1 hour; capped to 5 min on 2026-08-26, see README caching table
+  static: 300,
 } as const;
 
 export class ApiError extends Error {

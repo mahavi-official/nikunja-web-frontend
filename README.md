@@ -111,12 +111,38 @@ What this app is responsible for:
 
 ### Caching
 
-| Content | `revalidate` |
-| --- | --- |
-| Listings, home | 60s |
-| Detail pages | 300s |
-| About, settings, taxonomies | 3600s |
-| Search, member reads | never cached |
+Every cached route/fetch is capped at **5 minutes (300s)** as of 2026-08-26.
+Anything that previously used a longer window (1 hour) had it commented out in
+place rather than deleted, so it can be restored by uncommenting one line —
+see `REVALIDATE.static` in `lib/api.ts` and the page-level `revalidate` export
+in `about/page.tsx`, `contact/page.tsx`, and `authors/page.tsx`.
+
+| Page / route | `revalidate` | Current (2026-08-26) |
+| --- | --- | --- |
+| `/` (home) | 0 (no ISR — always dynamic) | 0 |
+| `/articles` | 60s | 60s |
+| `/articles/[slug]` | 300s | 300s |
+| `/articles/category/[slug]` | 60s | 60s |
+| `/blogs` | 60s | 60s |
+| `/blogs/[slug]` | 300s | 300s |
+| `/blogs/category/[slug]` | 60s | 60s |
+| `/research` | 60s | 60s |
+| `/research/[slug]` | 300s | 300s |
+| `/gallery` | 60s | 60s |
+| `/gallery/[slug]` | 300s | 300s |
+| `/videos` | 60s | 60s |
+| `/videos/[slug]` | 300s | 300s |
+| `/tags/[slug]` | 60s | 60s |
+| `/authors` | ~~3600s~~ capped to 300s | 300s |
+| `/authors/[slug]` | 300s | 300s |
+| `/about` | ~~3600s~~ capped to 300s | 300s |
+| `/contact` | ~~3600s~~ capped to 300s | 300s |
+| Search, member reads (`/account`, etc.) | never cached | never cached |
+
+All of the above are also invalidated on demand via `POST /api/revalidate`
+(tag-based, called by the backend on save), so the `revalidate` window is only
+a fallback for a revalidation event that never arrives — it is not the only
+way content updates.
 
 Dynamic routes pre-render their newest ~50 entries via `generateStaticParams()`
 and serve the long tail on demand (`dynamicParams = true`).
