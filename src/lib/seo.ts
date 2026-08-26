@@ -10,7 +10,7 @@ import type { Seo, Settings } from "./types";
  */
 
 export const SITE_NAME = "Radhakundah";
-export const SITE_TAGLINE = "Research, articles, and living tradition from Radha Kunda";
+export const SITE_TAGLINE = "Research, articles, wisdom and tradition from nepal";
 
 const INDEXING_ENABLED = process.env.NEXT_PUBLIC_ENABLE_INDEXING === "true";
 
