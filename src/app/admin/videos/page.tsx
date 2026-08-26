@@ -191,7 +191,7 @@ function VideosList() {
     <>
       <PageHeader
         title="Videos"
-        description="Talks, kirtan, and documentary footage. Everything is embedded from YouTube."
+        description="Still knowledge, set into motion — voices, stories, and ideas. Everything is embedded from YouTube."
         actions={
           <AdminButton onClick={() => open("new")}>
             <Plus className="size-4" aria-hidden />

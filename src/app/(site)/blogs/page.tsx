@@ -5,7 +5,7 @@ import { PostListingView } from "@/components/listing/PostListingView";
 export const revalidate = 60;
 
 const DESCRIPTION =
-  "Field notes, announcements, and shorter writing from the Radhakundah team and its contributors.";
+  "Illuminating wisdom, one idea at a time.";
 
 type SearchParams = Promise<{ page?: string }>;
 

@@ -68,7 +68,7 @@ export async function Footer() {
               New research and writing, as it is published
             </h2>
             <p className="mt-3 max-w-md text-sm text-sand-300/80">
-              An occasional letter. No campaigns, no resale of your address, one click to leave.
+              Our home for research, scholarship, writing, and digital platform on wisdom, culture, heritage, science & innovation.
             </p>
           </div>
           <div className="md:justify-self-end md:w-full md:max-w-md">

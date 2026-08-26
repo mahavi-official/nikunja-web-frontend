@@ -67,13 +67,13 @@ export default async function HomePage() {
         <div className="container-page grid gap-10 py-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <p className="font-serif text-xl leading-relaxed text-ink md:text-2xl md:leading-[1.55]">
-              Radha Kunda has been written about for five hundred years, and photographed for a
-              hundred. This is where we keep that work: peer-reviewed papers alongside the essays,
-              pictures, and recordings that surround them, published in full and free to read.
+              Radhakundah , located in Kathmandu, Nepal. , is a private research institution and 
+              think tank advancing disciplined inquiry across Nepal's wisdom, culture, and 
+              science - nurturing research at home, connecting scholarship worldwide, and decoding 
+              Nepal's potential for the world.
             </p>
             <p className="mt-5 max-w-xl text-ink-soft">
-              Nothing here is behind a paywall. Signing in only unlocks the full PDFs, which we host
-              ourselves so they stay available.
+              A reservoir of wisdom, poured out for the world.
             </p>
           </div>
 

@@ -42,7 +42,7 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
       <ListingShell
         eyebrow="Photography"
         title="Gallery"
-        description="Each segment gathers a set of photographs around one place, season, or observance."
+        description=" Small moments, gathered like stars, from across our journey."
         breadcrumbs={trail}
         total={meta.total}
       >

@@ -6,7 +6,7 @@ import { PostListingView } from "@/components/listing/PostListingView";
 export const revalidate = 60;
 
 const DESCRIPTION =
-  "Considered, edited writing on the history, philosophy, and practice surrounding Radha Kunda.";
+  "Independent research and commentary on the questions that shape Nepal.";
 
 type SearchParams = Promise<{ page?: string }>;
 

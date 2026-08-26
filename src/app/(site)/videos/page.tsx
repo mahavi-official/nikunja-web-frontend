@@ -47,7 +47,7 @@ export default async function VideosPage({ searchParams }: { searchParams: Searc
       <ListingShell
         eyebrow="Watch"
         title="Videos"
-        description="Talks, kirtan, and documentary footage. Every video has its own page, so each one can be found and shared on its own."
+        description="Still knowledge, set into motion — voices, stories, and ideas that flow from our work."
         breadcrumbs={trail}
         total={meta.total}
         filters={{
