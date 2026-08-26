@@ -78,7 +78,7 @@ export function NewsletterForm({ tone = "inverse" }: { tone?: "inverse" | "defau
         <button
           type="submit"
           disabled={state === "sending"}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-flame-500 px-6 text-[0.9375rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-flame-600 disabled:opacity-60"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#ef9f00] px-6 text-[0.9375rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-[#d68f00] disabled:opacity-60"
         >
           {state === "sending" ? (
             <Loader2 className="size-4 animate-spin" aria-hidden />

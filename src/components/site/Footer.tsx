@@ -63,7 +63,7 @@ export async function Footer() {
       <div className="border-b border-white/10">
         <div className="container-page grid gap-8 py-14 md:grid-cols-2 md:items-center">
           <div>
-            <span className="eyebrow text-flame-400">Stay close</span>
+            <span className="eyebrow text-[#ef9f00]">Stay close</span>
             <h2 className="mt-2 text-2xl text-white md:text-3xl">
               New research and writing, as it is published
             </h2>
@@ -109,7 +109,7 @@ export async function Footer() {
 
         {COLUMNS.map((column) => (
           <nav key={column.title} aria-label={column.title} className="md:col-span-2">
-            <h3 className="text-[0.6875rem] font-semibold tracking-[0.16em] text-flame-400 uppercase">
+            <h3 className="text-[0.6875rem] font-semibold tracking-[0.16em] text-[#ef9f00] uppercase">
               {column.title}
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -129,7 +129,7 @@ export async function Footer() {
 
         {(email || phone || address) && (
           <div className="md:col-span-2">
-            <h3 className="text-[0.6875rem] font-semibold tracking-[0.16em] text-flame-400 uppercase">
+            <h3 className="text-[0.6875rem] font-semibold tracking-[0.16em] text-[#ef9f00] uppercase">
               Contact
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-sand-300/80">

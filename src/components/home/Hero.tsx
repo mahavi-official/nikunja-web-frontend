@@ -140,7 +140,10 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
 
           <div className="mt-9 flex flex-wrap items-center gap-6">
             {slide.ctaUrl && slide.ctaLabel ? (
-              <Link href={slide.ctaUrl} className={buttonClass("primary", "lg")}>
+              <Link
+                href={slide.ctaUrl}
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-[2px] bg-[#ef9f00] px-8 text-[0.9375rem] font-medium tracking-[0.01em] whitespace-nowrap text-white transition-colors duration-200 hover:bg-[#d68f00] active:bg-[#c17f00]"
+              >
                 {slide.ctaLabel}
               </Link>
             ) : null}
