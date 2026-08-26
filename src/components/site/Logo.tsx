@@ -67,7 +67,7 @@ export function Logo({
             tone === "inverse" ? "text-sand-300" : "text-ink-muted"
           )}
         >
-          Research &amp; Tradition
+          Research &amp; wisdom
         </span>
       </span>
     </span>
