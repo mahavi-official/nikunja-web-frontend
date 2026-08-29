@@ -54,7 +54,7 @@ const GROUPS: { title: string; description: string; keys: KnownSetting[] }[] = [
         key: "seo.defaultOgImage",
         label: "Default social image",
         type: "url",
-        hint: "1200×630. Shown when a page has no image of its own.",
+        hint: "At least 1200×800, ideally 1600×1200. Shown when a page has no image of its own.",
       },
     ],
   },

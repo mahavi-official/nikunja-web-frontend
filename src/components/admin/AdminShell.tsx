@@ -145,7 +145,14 @@ function Sidebar({ viewer, onNavigate }: { viewer: Viewer; onNavigate?: () => vo
       {/* `px-6` here against the nav's `px-3` + each row's own `px-3`: the
           logo, every icon and the group labels all start on the same 24px
           line down the rail. Change one of the three and you break it. */}
-      <div className="mandala-field relative flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b border-white/10 px-6">
+      {/* The masthead is a link out to the public site, the way the header and
+          footer lockups already are. It was the one place the mark rendered as
+          dead text, which reads as broken rather than as deliberate. */}
+      <Link
+        href="/"
+        aria-label="Radhakundah — go to the public site"
+        className="mandala-field relative flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b border-white/10 px-6 transition-colors hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none"
+      >
         <LogoMark className="relative size-8 shrink-0" />
         <span className="relative flex min-w-0 flex-col leading-none">
           <span className="font-display text-lg font-semibold text-white">Radhakundah</span>
@@ -153,7 +160,7 @@ function Sidebar({ viewer, onNavigate }: { viewer: Viewer; onNavigate?: () => vo
             Content studio
           </span>
         </span>
-      </div>
+      </Link>
 
       <nav
         aria-label="Admin"

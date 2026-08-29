@@ -3,7 +3,7 @@ import { Eye } from "lucide-react";
 import { ApiError, getVideo, listVideos } from "@/lib/api";
 import { metadataFromSeo } from "@/lib/seo";
 import { redirectOrNotFound } from "@/lib/navigation";
-import { formatCount, formatDate, formatDuration, isoDate } from "@/lib/format";
+import { formatCount, formatDate, formatDuration, isoDate, toParagraphs } from "@/lib/format";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui/primitives";
 import { YouTubeEmbed } from "@/components/video/YouTubeEmbed";
 import { VideoCard } from "@/components/cards";
@@ -92,11 +92,11 @@ export default async function VideoPage({ params }: { params: Params }) {
               ) : null}
             </div>
 
-            {video.description ? (
-              <p className="mt-6 leading-relaxed whitespace-pre-line text-ink-soft">
-                {video.description}
+            {toParagraphs(video.description).map((paragraph, index) => (
+              <p key={index} className="mt-6 leading-relaxed text-ink-soft">
+                {paragraph}
               </p>
-            ) : null}
+            ))}
 
             <div className="mt-8 border-t border-line pt-6">
               <ShareRow url={seo.canonical} title={video.title} />

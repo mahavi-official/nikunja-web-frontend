@@ -221,6 +221,28 @@ function decodeHtml(value: string): string {
     .replace(/&gt;/g, ">");
 }
 
+/**
+ * Splits plain text into paragraphs on blank lines, rejoining the single
+ * newlines inside each one into spaces.
+ *
+ * Abstracts and descriptions get pasted out of PDFs and Word, which carry a
+ * hard newline at the end of every typeset line. Rendering that with
+ * `white-space: pre-line` faithfully reproduces the *source document's* line
+ * wrapping, so sentences break mid-clause at whatever width the PDF happened
+ * to use — while the admin textarea soft-wraps and looks perfectly fine, which
+ * is why the two never agreed. Only a blank line is treated as a real
+ * paragraph break, because only a blank line reliably means one.
+ */
+export function toParagraphs(text: string | null | undefined): string[] {
+  if (!text) return [];
+
+  return text
+    .replace(/\r\n?/g, "\n")
+    .split(/\n[ \t]*\n+/)
+    .map((block) => block.replace(/[ \t]*\n[ \t]*/g, " ").replace(/[ \t]{2,}/g, " ").trim())
+    .filter(Boolean);
+}
+
 export function mediaAlt(media: Media | null | undefined, fallback: string): string {
   return media?.alt?.trim() || fallback;
 }
