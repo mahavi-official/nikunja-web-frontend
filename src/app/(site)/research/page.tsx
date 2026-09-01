@@ -9,7 +9,7 @@ import { cn } from "@/lib/format";
 export const revalidate = 60;
 
 const DESCRIPTION =
-  "Peer research and scholarly publications on Radha Kunda — abstracts and academic metadata open to all, full texts available to signed-in readers.";
+  "Peer research and scholarly publications on Radha Kundah — abstracts and academic metadata open to all, full texts available to signed-in readers.";
 
 type SearchParams = Promise<{ page?: string; category?: string; year?: string; q?: string }>;
 

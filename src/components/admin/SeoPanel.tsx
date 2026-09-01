@@ -163,7 +163,7 @@ export function SeoPanel({
                 id="seo-keywords"
                 value={metaKeywords ?? ""}
                 onChange={(event) => onChange({ metaKeywords: event.target.value })}
-                placeholder="radha kunda, parikrama, kartik"
+                placeholder="radha kundah, parikrama, kartik"
               />
             </Field>
           ) : null}

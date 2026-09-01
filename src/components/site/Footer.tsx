@@ -84,7 +84,7 @@ export async function Footer() {
             <Logo tone="inverse" />
           </Link>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-sand-300/75">
-            A publishing home for scholarship, writing, and media on Radha Kunda and the tradition
+            A publishing home for scholarship, writing, and media on Radha Kundah and the tradition
             around it.
           </p>
 

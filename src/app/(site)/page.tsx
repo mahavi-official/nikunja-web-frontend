@@ -18,7 +18,7 @@ export async function generateMetadata() {
       title: `${title} — ${SITE_TAGLINE}`,
       description:
         (settings["site.description"] as string) ||
-        "Research publications, articles, galleries, and recorded talks from Radha Kunda.",
+        "Research publications, articles, galleries, and recorded talks from Radha Kundah.",
       path: "/",
     }),
     // The homepage owns the bare domain as its canonical.
@@ -211,7 +211,7 @@ export default async function HomePage() {
           <div className="container-page">
             <SectionHeading
               eyebrow="Gallery"
-              title="Seen at the kunda"
+              title="Seen at the kundah"
               description="Each segment is one set of photographs, gathered around a place, a season, or an observance."
               href="/gallery"
               linkLabel="All segments"

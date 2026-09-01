@@ -258,7 +258,7 @@ function Segments() {
               autoFocus
               value={draft.name}
               onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-              placeholder="Kartik at the kunda"
+              placeholder="Kartik at the kundah"
             />
           </Field>
 

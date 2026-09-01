@@ -168,9 +168,10 @@ async function tolerate<T>(promise: Promise<T>, fallback: T): Promise<T> {
   try {
     return await promise;
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[api] soft failure:", (error as Error).message);
-    }
+    // Logged in every environment — a swallowed failure here renders as a
+    // silent empty listing/section with no other trace, so it must show up
+    // in production logs to be diagnosable at all.
+    console.warn("[api] soft failure:", (error as Error).message);
     return fallback;
   }
 }

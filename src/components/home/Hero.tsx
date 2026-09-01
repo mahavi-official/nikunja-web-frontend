@@ -230,7 +230,7 @@ export function StaticHero() {
             ॥ राधाकुण्ड ॥
           </span>
           <h1 className="mt-5 text-[clamp(2.5rem,5vw,4rem)] leading-[1.06] font-semibold text-navy-900 dark:text-white">
-            Scholarship and living tradition, gathered around Radha Kunda
+            Scholarship and living tradition, gathered around Radha Kundah
           </h1>
           <p className="mt-6 max-w-xl font-serif text-lg leading-relaxed text-ink-soft">
             Peer-reviewed research, long-form articles, photography, and recorded talks, published

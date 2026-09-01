@@ -20,7 +20,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   return buildPageMetadata({
     title: page > 1 ? `Gallery — page ${page}` : "Gallery",
     description:
-      "Photographic segments documenting Radha Kunda — its seasons, its observances, and the people who keep it.",
+      "Photographic segments documenting Radha Kundah — its seasons, its observances, and the people who keep it.",
     path: page > 1 ? `/gallery?page=${page}` : "/gallery",
     pagination: { page, totalPages: meta.totalPages },
   });
