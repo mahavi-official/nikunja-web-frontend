@@ -168,7 +168,10 @@ export function RichTextEditor({
   };
 
   const insertImage = (media: Media) => {
-    const url = mediaUrl(media, "large") ?? media.url;
+    // Bail rather than bake an unresolvable src into saved post HTML, where it
+    // would outlive whatever is wrong with the record.
+    const url = mediaUrl(media, "large");
+    if (!url) return;
     const alt = (media.alt ?? media.fileName).replace(/"/g, "&quot;");
     restoreSelection();
     document.execCommand(

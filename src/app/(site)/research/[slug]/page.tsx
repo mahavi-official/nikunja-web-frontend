@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ApiError, getResearch, listResearch } from "@/lib/api";
 import { metadataFromSeo } from "@/lib/seo";
 import { redirectOrNotFound } from "@/lib/navigation";
-import { formatDate, isoDate } from "@/lib/format";
+import { formatDate, isoDate, toParagraphs } from "@/lib/format";
 import { Badge, Breadcrumbs, JsonLd, SectionHeading } from "@/components/ui/primitives";
 import { CoverImage } from "@/components/ui/CoverImage";
 import { ResearchCard } from "@/components/cards";
@@ -157,9 +157,14 @@ export default async function ResearchDetailPage({ params }: { params: Params })
               track past the viewport instead of wrapping. */}
           <div className="min-w-0 lg:col-span-8">
             <h2 className="text-lg">Abstract</h2>
-            <p className="mt-4 text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-soft">
-              {research.abstract}
-            </p>
+            {toParagraphs(research.abstract).map((paragraph, index) => (
+              <p
+                key={index}
+                className="mt-4 text-[1.0625rem] leading-relaxed text-ink-soft"
+              >
+                {paragraph}
+              </p>
+            ))}
 
             {research.keywords?.length ? (
               <div className="mt-8 flex flex-wrap items-center gap-2">

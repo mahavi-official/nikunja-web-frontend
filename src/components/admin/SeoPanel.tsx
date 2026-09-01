@@ -186,7 +186,7 @@ export function SeoPanel({
           {showOgImage ? (
             <ImageField
               label="Social share image"
-              hint="1200×630 works best. Falls back to the cover image, then the site default."
+              hint="At least 1200×800, ideally 1600×1200. The same upload is cropped to 1:1, 3:2 and 1.91:1, so anything shorter than 800px gets cropped tight and looks soft. Falls back to the cover image, then the site default."
               value={ogImage ?? null}
               onChange={(media) => onChange({ ogImage: media })}
             />

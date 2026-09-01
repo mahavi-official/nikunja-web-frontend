@@ -6,7 +6,7 @@ import { PostCard } from "@/components/cards";
 import { ShareRow } from "@/components/post/ShareRow";
 import { ViewCounter } from "@/components/post/ViewCounter";
 import { Engagement } from "@/components/post/Engagement";
-import { formatCount, formatDate, isoDate, readingTime } from "@/lib/format";
+import { formatCount, formatDate, isoDate, normalizeMediaHtml, readingTime } from "@/lib/format";
 import { postPath } from "@/lib/seo";
 import type { Comment, Post, Seo } from "@/lib/types";
 
@@ -100,8 +100,13 @@ export function PostArticle({
 
         <div className="container-page py-8 md:py-12">
           <div className="mx-auto max-w-3xl">
-            {/* HTML sanitised server-side by sanitize-html when the post was saved. */}
-            <div className="prose-content" dangerouslySetInnerHTML={{ __html: post.content ?? "" }} />
+            {/* HTML sanitised server-side by sanitize-html when the post was saved;
+                image srcs are re-pinned here, since a body can be years older
+                than the storage layout it was written against. */}
+            <div
+              className="prose-content"
+              dangerouslySetInnerHTML={{ __html: normalizeMediaHtml(post.content) }}
+            />
 
             {post.tags?.length ? (
               <div className="mt-12 flex flex-wrap items-center gap-2">

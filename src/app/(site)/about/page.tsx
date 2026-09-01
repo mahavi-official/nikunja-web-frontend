@@ -2,6 +2,7 @@ import { Eye, Target } from "lucide-react";
 import { getAboutPage } from "@/lib/api";
 import { metadataFromSeo, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs, ButtonLink, JsonLd, SectionHeading } from "@/components/ui/primitives";
+import { normalizeMediaHtml, normalizeMediaUrl } from "@/lib/format";
 import type { AboutSections } from "@/lib/types";
 
 // Saving the page in admin clears this cache immediately (see
@@ -70,7 +71,7 @@ export default async function AboutPage() {
             // Sanitised HTML from the CMS's rich-text editor — same pattern as PostArticle.
             <div
               className="prose-content mt-6 max-w-3xl text-lg text-ink-soft"
-              dangerouslySetInnerHTML={{ __html: text(sections.about)! }}
+              dangerouslySetInnerHTML={{ __html: normalizeMediaHtml(text(sections.about)) }}
             />
           ) : null}
         </div>
@@ -138,16 +139,18 @@ export default async function AboutPage() {
           <div className="container-page">
             <SectionHeading eyebrow="The people" title="Our team" />
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {team.map((member, index) => (
+              {team.map((member, index) => {
+                const photo = normalizeMediaUrl(member?.photoUrl);
+                return (
                 <div key={index} className="text-center">
                   <div className="relative mx-auto size-28 overflow-hidden rounded-full bg-surface-sunken">
-                    {member?.photoUrl ? (
+                    {photo ? (
                       // A free-form URL out of the CMS JSON, so it cannot go
                       // through next/image — that would need the host declared
                       // in remotePatterns ahead of time.
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={member.photoUrl}
+                        src={photo}
                         alt={member.name ?? "Team member"}
                         loading="lazy"
                         className="size-full object-cover"
@@ -166,7 +169,8 @@ export default async function AboutPage() {
                     <p className="mt-2 text-sm leading-relaxed text-ink-muted">{member.bio}</p>
                   ) : null}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>

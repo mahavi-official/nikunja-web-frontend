@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn, mediaUrl } from "@/lib/format";
@@ -13,8 +13,25 @@ import type { GalleryImage } from "@/lib/types";
  * enforces alt at upload, for accessibility and image SEO), so the grid is
  * meaningful with JavaScript disabled — the lightbox is the enhancement.
  */
-export function GalleryGrid({ images }: { images: GalleryImage[] }) {
+export function GalleryGrid({ images: input }: { images: GalleryImage[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  // Resolve every URL up front and drop what we cannot render. A broken box in
+  // the grid is bad on its own, but an unrenderable entry left in the list also
+  // throws off the lightbox's index arithmetic.
+  const images = useMemo(
+    () =>
+      input
+        .map((image) => ({
+          image,
+          thumb: mediaUrl(image.media, "medium"),
+          full: mediaUrl(image.media, "large"),
+        }))
+        .filter((entry): entry is { image: GalleryImage; thumb: string; full: string } =>
+          Boolean(entry.thumb && entry.full)
+        ),
+    [input]
+  );
 
   const close = useCallback(() => setOpenIndex(null), []);
   const move = useCallback(
@@ -42,12 +59,13 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
     };
   }, [openIndex, close, move]);
 
-  const active = openIndex === null ? null : images[openIndex];
+  const entry = openIndex === null ? null : images[openIndex];
+  const active = entry?.image ?? null;
 
   return (
     <>
       <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        {images.map((image, index) => (
+        {images.map(({ image, thumb }, index) => (
           <li key={image.id}>
             <button
               type="button"
@@ -60,7 +78,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
               )}
             >
               <Image
-                src={mediaUrl(image.media, "medium") ?? image.media.url}
+                src={thumb}
                 alt={image.alt}
                 fill
                 sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
@@ -77,7 +95,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
         ))}
       </ul>
 
-      {active ? (
+      {active && entry ? (
         <div
           role="dialog"
           aria-modal="true"
@@ -100,7 +118,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
 
           <div className="relative flex-1">
             <Image
-              src={mediaUrl(active.media, "large") ?? active.media.url}
+              src={entry.full}
               alt={active.alt}
               fill
               sizes="100vw"

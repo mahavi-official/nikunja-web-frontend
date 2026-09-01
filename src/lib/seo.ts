@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "./api";
+import { normalizeMediaUrl } from "./format";
 import type { Seo, Settings } from "./types";
 
 /**
@@ -33,7 +34,10 @@ function robotsFrom(directive: string | undefined, forceNoIndex: boolean) {
  * logic here, the API already resolved every field.
  */
 export function metadataFromSeo(seo: Seo, extra?: { keywords?: string[] }): Metadata {
-  const image = seo.openGraph.image;
+  // Same pinning as the on-page images: a crawler must not be handed a URL
+  // that 404s either.
+  const image = normalizeMediaUrl(seo.openGraph.image);
+  const twitterImage = normalizeMediaUrl(seo.twitter.image);
 
   return {
     title: seo.title,
@@ -60,7 +64,7 @@ export function metadataFromSeo(seo: Seo, extra?: { keywords?: string[] }): Meta
       card: "summary_large_image",
       title: seo.twitter.title,
       description: seo.twitter.description,
-      images: seo.twitter.image ? [seo.twitter.image] : undefined,
+      images: twitterImage ? [twitterImage] : undefined,
     },
   };
 }

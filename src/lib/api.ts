@@ -87,6 +87,29 @@ function withQuery(path: string, query?: Query): string {
   return qs ? `${path}?${qs}` : path;
 }
 
+/**
+ * Escape hatch for the failure mode described below. Left off: the API no
+ * longer returns responses large enough to trigger it.
+ *
+ * `Media.variants` used to hold base64 image bytes rather than derivative
+ * URLs, so a content response ran to megabytes (`/public/home` measured
+ * 2.47MB). Next refuses to write anything over 2MB into the Data Cache, which
+ * on its own would only mean "uncached but fresh". The damage came once an
+ * entry already existed and went stale: Next serves the stale copy, revalidates
+ * in the background, and the write fails again — so the entry is never
+ * replaced and the page freezes on old data permanently rather than for
+ * `revalidate` seconds. That is what pinned the homepage to a deleted hero
+ * slide and `/research` to an empty listing while the API was returning a
+ * paper.
+ *
+ * Turning this on bypasses the Data Cache so nothing can go stale, at the cost
+ * of one API call per render. It also forces every read to hit a live API at
+ * build time, which breaks `next build` unless the backend is running — and
+ * `.next` is built locally by `deploy/build-package.sh`, so keep it off unless
+ * you are debugging a stale-data problem.
+ */
+const BYPASS_DATA_CACHE = false;
+
 interface FetchOptions {
   revalidate?: number | false;
   tags?: string[];
@@ -106,7 +129,7 @@ async function apiFetch<T>(path: string, options: FetchOptions = {}): Promise<Ap
         Accept: "application/json",
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
       },
-      ...(options.noStore
+      ...(options.noStore || BYPASS_DATA_CACHE
         ? { cache: "no-store" as const }
         : {
             next: {
