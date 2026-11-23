@@ -1,8 +1,22 @@
-import Link from "next/link";
 import { CoverImage, RemoteImage } from "@/components/ui/CoverImage";
-import { cn, formatDate, formatDateShort, formatDuration, isoDate, truncate } from "@/lib/format";
+import {
+  cn,
+  formatDate,
+  formatDateShort,
+  formatDuration,
+  isoDate,
+  truncate,
+} from "@/lib/format";
 import { postPath } from "@/lib/seo";
-import type { Author, GallerySegment, Post, PostSummary, Research, Video } from "@/lib/types";
+import type {
+  Author,
+  GallerySegment,
+  Post,
+  PostSummary,
+  Research,
+  Video,
+} from "@/lib/types";
+import Link from "next/link";
 
 /**
  * Every entry on this site is set the same way, and the way is a printed one.
@@ -15,18 +29,26 @@ import type { Author, GallerySegment, Post, PostSummary, Research, Video } from 
  * `ENTRY` is that rule, shared so a grid of research sits on the same baseline
  * grammar as a column of videos.
  */
-const ENTRY = "group border-t border-line-strong pt-4 transition-colors hover:border-ink";
+const ENTRY =
+  "group border-t border-line-strong pt-4 transition-colors hover:border-ink";
 
 /** Title link: ink at rest, saffron under the pointer. No arrow, ever. */
-const TITLE_LINK = "transition-colors group-hover:text-flame-700 dark:group-hover:text-flame-300";
+const TITLE_LINK =
+  "transition-colors group-hover:text-flame-700 dark:group-hover:text-flame-300";
 
 /** The apparatus line — date, category, counts. One line of small capitals. */
-function MetaLine({ children, className }: { children: React.ReactNode; className?: string }) {
+function MetaLine({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div
       className={cn(
         "flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.6875rem] font-semibold tracking-[0.16em] uppercase text-ink-muted",
-        className
+        className,
       )}
     >
       {children}
@@ -59,7 +81,9 @@ export function PostCard({
   const target =
     href ?? ("placement" in post ? postPath(post) : `/articles/${post.slug}`);
   const category =
-    "categories" in post && post.categories?.length ? post.categories[0].category : null;
+    "categories" in post && post.categories?.length
+      ? post.categories[0].category
+      : null;
 
   /* The list form: a thumbnail the size of a stamp, and the title doing the
      rest. Used where a page needs many entries in a short column. */
@@ -104,9 +128,15 @@ export function PostCard({
         </Link>
 
         <MetaLine className="mt-5">
-          {category ? <span className="text-flame-700 dark:text-flame-300">{category.name}</span> : null}
+          {category ? (
+            <span className="text-flame-700 dark:text-flame-300">
+              {category.name}
+            </span>
+          ) : null}
           {category ? <Dot /> : null}
-          <time dateTime={isoDate(post.publishedAt)}>{formatDate(post.publishedAt)}</time>
+          <time dateTime={isoDate(post.publishedAt)}>
+            {formatDate(post.publishedAt)}
+          </time>
         </MetaLine>
 
         <h3 className="mt-2.5 text-3xl leading-[1.15] md:text-[2.25rem]">
@@ -146,9 +176,18 @@ export function PostCard({
       </Link>
 
       <MetaLine className="mt-4">
-        {category ? <span className="text-flame-700 dark:text-flame-300">{category.name}</span> : null}
+        {category ? (
+          <span className="text-flame-700 dark:text-flame-300">
+            {category.name}
+          </span>
+        ) : null}
         {category ? <Dot /> : null}
-        <time dateTime={isoDate(post.publishedAt)}>{formatDate(post.publishedAt)}</time>
+        <time dateTime={isoDate(post.publishedAt)}>
+          {formatDate(post.publishedAt)}
+        </time>
+        <span className="inline-flex items-center rounded-full border px-2 py-1 bg-flame-700 text-white">
+          {"placement" in post ? post.placement : ""}
+        </span>
       </MetaLine>
 
       <h3 className="mt-2 text-xl leading-snug">
@@ -196,7 +235,9 @@ export function ResearchCard({ research }: { research: Research }) {
   return (
     <article className={cn(ENTRY, "flex flex-col")}>
       <MetaLine>
-        {research.publicationYear ? <span>{research.publicationYear}</span> : null}
+        {research.publicationYear ? (
+          <span>{research.publicationYear}</span>
+        ) : null}
         {research.publicationYear && research.category ? <Dot /> : null}
         {research.category ? <span>{research.category.name}</span> : null}
       </MetaLine>
@@ -215,7 +256,9 @@ export function ResearchCard({ research }: { research: Research }) {
 
       {research.journal || files ? (
         <p className="mt-4 text-sm text-ink-muted">
-          {research.journal ? <span className="italic">{research.journal}</span> : null}
+          {research.journal ? (
+            <span className="italic">{research.journal}</span>
+          ) : null}
           {research.journal && files ? <span aria-hidden> · </span> : null}
           {files}
         </p>
@@ -249,8 +292,12 @@ export function ResearchIndexRow({ research }: { research: Research }) {
         <p className="mt-2 text-sm text-ink-soft">
           {authors}
           {authors && research.journal ? <span aria-hidden> · </span> : null}
-          {research.journal ? <span className="italic">{research.journal}</span> : null}
-          {(authors || research.journal) && files ? <span aria-hidden> · </span> : null}
+          {research.journal ? (
+            <span className="italic">{research.journal}</span>
+          ) : null}
+          {(authors || research.journal) && files ? (
+            <span aria-hidden> · </span>
+          ) : null}
           {files ? <span className="text-ink-muted">{files}</span> : null}
         </p>
       </div>
@@ -260,7 +307,13 @@ export function ResearchIndexRow({ research }: { research: Research }) {
 
 /* ── video ──────────────────────────────────────────────────── */
 
-export function VideoCard({ video, priority = false }: { video: Video; priority?: boolean }) {
+export function VideoCard({
+  video,
+  priority = false,
+}: {
+  video: Video;
+  priority?: boolean;
+}) {
   return (
     <article className={cn(ENTRY, "flex flex-col")}>
       <Link
@@ -276,7 +329,9 @@ export function VideoCard({ video, priority = false }: { video: Video; priority?
         {/* A running time is the honest way to say "this is a video" — more
             useful than a play button drawn over the picture. */}
         {video.durationSec ? (
-          <span className="tabular-nums tracking-[0.08em]">{formatDuration(video.durationSec)}</span>
+          <span className="tabular-nums tracking-[0.08em]">
+            {formatDuration(video.durationSec)}
+          </span>
         ) : null}
         {video.durationSec && video.category ? <Dot /> : null}
         {video.category ? <span>{video.category.name}</span> : null}
@@ -288,7 +343,10 @@ export function VideoCard({ video, priority = false }: { video: Video; priority?
         </Link>
       </h3>
 
-      <time dateTime={isoDate(video.publishedAt)} className="mt-2 text-sm text-ink-muted">
+      <time
+        dateTime={isoDate(video.publishedAt)}
+        className="mt-2 text-sm text-ink-muted"
+      >
         {formatDate(video.publishedAt)}
       </time>
     </article>
@@ -301,14 +359,25 @@ export function VideoCard({ video, priority = false }: { video: Video; priority?
  * The photograph is left alone — no scrim poured over it, no type printed
  * across it. The caption sits underneath where a caption belongs.
  */
-export function GalleryCard({ segment, priority = false }: { segment: GallerySegment; priority?: boolean }) {
+export function GalleryCard({
+  segment,
+  priority = false,
+}: {
+  segment: GallerySegment;
+  priority?: boolean;
+}) {
   const count = segment._count?.images ?? segment.images?.length;
 
   return (
     <article className="group">
       <Link href={`/gallery/${segment.slug}`} className="block">
         <div className="relative aspect-4/3 overflow-hidden rounded-[var(--radius-card)] bg-surface-sunken">
-          <CoverImage media={segment.coverImage} alt={segment.name} size="large" priority={priority} />
+          <CoverImage
+            media={segment.coverImage}
+            alt={segment.name}
+            size="large"
+            priority={priority}
+          />
         </div>
 
         <div className="mt-3 border-t border-line pt-3 transition-colors group-hover:border-ink">
@@ -321,9 +390,13 @@ export function GalleryCard({ segment, priority = false }: { segment: GallerySeg
                 {count} photograph{count === 1 ? "" : "s"}
               </span>
             ) : null}
-            {count !== undefined && segment.description ? <span aria-hidden> · </span> : null}
+            {count !== undefined && segment.description ? (
+              <span aria-hidden> · </span>
+            ) : null}
             {segment.description ? (
-              <span className="line-clamp-1 align-baseline">{segment.description}</span>
+              <span className="line-clamp-1 align-baseline">
+                {segment.description}
+              </span>
             ) : null}
           </p>
         </div>
