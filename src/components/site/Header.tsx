@@ -14,7 +14,7 @@ import { cn } from "@/lib/format";
 const NAV = [
   { href: "/research", label: "Research" },
   { href: "/articles", label: "Articles" },
-  { href: "/blogs", label: "Blogs" },
+  { href: "/newsletter", label: "Newsletter" },
   { href: "/gallery", label: "Gallery" },
   { href: "/videos", label: "Videos" },
   { href: "/about", label: "About" },
