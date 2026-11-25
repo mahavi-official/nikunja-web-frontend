@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { permanentRedirect } from "next/navigation";
 import { ApiError, getPost, listComments, listPosts } from "@/lib/api";
 import { metadataFromSeo } from "@/lib/seo";
