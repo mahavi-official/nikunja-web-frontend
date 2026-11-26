@@ -1,0 +1,98 @@
+# Deploys radhakundah.com (Azure App Service "radhakundah-v2").
+#
+# Builds the same site.zip that mahavi-official/deployment's build-package.sh
+# builds by hand — backend source + prebuilt frontend .next + gateway/startup —
+# and zip-deploys it. startup.sh on the server installs dependencies and applies
+# database migrations on boot, as with a manual deploy.
+#
+# Runs on every merge to main here, and on demand from the Actions tab
+# ("Run workflow") — use that after a backend-only change.
+#
+# One-time setup: repository secret AZURE_WEBAPP_PUBLISH_PROFILE, the contents
+# of the publish profile downloaded from the web app's Overview page in Azure.
+
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never two deploys at once; a newer one waits for the running one.
+concurrency:
+  group: deploy-radhakundah-v2
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  AZ_APP: radhakundah-v2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check the Azure publish profile is set
+        env:
+          PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        run: |
+          if [ -z "$PUBLISH_PROFILE" ]; then
+            echo "::error::Add the repository secret AZURE_WEBAPP_PUBLISH_PROFILE (Settings > Secrets and variables > Actions) with the publish profile from the Azure portal."
+            exit 1
+          fi
+
+      - name: Check out frontend
+        uses: actions/checkout@v4
+        with:
+          path: nikunja-web-frontend
+
+      - name: Check out backend
+        uses: actions/checkout@v4
+        with:
+          repository: mahavi-official/NikunjaWebBackend
+          ref: main
+          path: NikunjaWebBackend
+
+      - name: Check out deployment scripts
+        uses: actions/checkout@v4
+        with:
+          repository: mahavi-official/deployment
+          ref: main
+          path: deployment
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build site.zip
+        env:
+          FRONTEND_SRC: ${{ github.workspace }}/nikunja-web-frontend
+          BACKEND_SRC: ${{ github.workspace }}/NikunjaWebBackend
+          NEXT_TELEMETRY_DISABLED: "1"
+          # Baked into the frontend at build time. Defaults are the values the
+          # live site was built with; override with repository variables.
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'https://radhakundah.com' }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://radhakundah.com' }}
+          NEXT_PUBLIC_CDN_URL: ${{ vars.NEXT_PUBLIC_CDN_URL || 'https://radhakundah.blob.core.windows.net' }}
+          # The live site currently serves robots.txt "Disallow: /". Set the
+          # repository variable to "true" when search engines should index it.
+          NEXT_PUBLIC_ENABLE_INDEXING: ${{ vars.NEXT_PUBLIC_ENABLE_INDEXING || 'false' }}
+        run: bash deployment/build-package.sh
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZ_APP }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: deployment/dist/site.zip
+
+      - name: Summary
+        run: |
+          {
+            echo "### Deployed to radhakundah-v2"
+            echo "Frontend: \`$(git -C nikunja-web-frontend rev-parse --short HEAD)\` · Backend: \`$(git -C NikunjaWebBackend rev-parse --short HEAD)\`"
+            echo ""
+            echo "The server now installs dependencies and runs migrations on boot; the site can answer 503 for 5–10 minutes."
+          } >> "$GITHUB_STEP_SUMMARY"
