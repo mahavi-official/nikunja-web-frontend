@@ -15,7 +15,7 @@ import {
 } from "./ui";
 import { useAsync } from "./useAsync";
 import { AdminApiError, useApi } from "@/lib/admin";
-import { cn, formatBytes, mediaUrl } from "@/lib/format";
+import { cn, formatBytes, mediaUrl, normalizeMediaUrl } from "@/lib/format";
 import type { Media } from "@/lib/types";
 
 /**
@@ -398,5 +398,59 @@ export function ImageField({
         selectedId={value?.id}
       />
     </>
+  );
+}
+
+/**
+ * A photo slot for content stored as a plain URL rather than a media id, such
+ * as team members inside the About page's JSON. Picks (or uploads) through the
+ * same media library and stores the image's URL.
+ */
+export function PhotoUrlField({
+  value,
+  onChange,
+  label = "Photo",
+}: {
+  value?: string | null;
+  onChange: (url: string | undefined) => void;
+  label?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const preview = normalizeMediaUrl(value);
+
+  return (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={preview ? `Replace ${label.toLowerCase()}` : `Choose ${label.toLowerCase()}`}
+        className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-line-strong bg-surface-sunken transition-colors hover:border-flame-400"
+      >
+        {preview ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={preview} alt="" className="size-full object-cover" />
+        ) : (
+          <ImageIcon className="size-5 text-ink-muted" aria-hidden />
+        )}
+      </button>
+
+      <div className="flex flex-wrap gap-2">
+        <AdminButton tone="secondary" size="sm" onClick={() => setOpen(true)}>
+          {preview ? "Replace photo" : "Add photo"}
+        </AdminButton>
+        {preview ? (
+          <AdminButton tone="ghost" size="sm" onClick={() => onChange(undefined)}>
+            <X className="size-3.5" aria-hidden />
+            Remove
+          </AdminButton>
+        ) : null}
+      </div>
+
+      <MediaPickerModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onPick={(media) => onChange(mediaUrl(media, "medium") ?? media.url)}
+      />
+    </div>
   );
 }

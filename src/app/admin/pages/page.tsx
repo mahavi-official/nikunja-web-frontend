@@ -15,6 +15,7 @@ import {
   useToast,
 } from "@/components/admin/ui";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { PhotoUrlField } from "@/components/admin/MediaPicker";
 import { SeoPanel } from "@/components/admin/SeoPanel";
 import { RequirePermission } from "@/components/admin/AdminShell";
 import { useAsync } from "@/components/admin/useAsync";
@@ -207,12 +208,23 @@ function AboutEditor() {
 
         <RepeaterPanel
           title="Team"
-          description="People shown with their role."
+          description="People shown with their role or department. Add a photo for each; without one, the first letter of the name is shown."
           items={draft.team ?? []}
           onChange={(next) => set("team", next)}
           create={() => ({ name: "", role: "", bio: "" })}
           render={(member, update) => (
             <div className="grid gap-2 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <PhotoUrlField
+                  value={member.photoUrl}
+                  onChange={(photoUrl) => {
+                    // Drop the key rather than store an empty string.
+                    const next = { ...member, photoUrl };
+                    if (!photoUrl) delete next.photoUrl;
+                    update(next);
+                  }}
+                />
+              </div>
               <Input
                 value={member.name}
                 onChange={(event) => update({ ...member, name: event.target.value })}
