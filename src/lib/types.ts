@@ -364,6 +364,43 @@ export interface Me {
   createdAt: string;
 }
 
+// ───────────────────────────── newsletter ─────────────────────────────
+
+export type NewsletterSendStatus = "NOT_SENT" | "SENDING" | "SENT" | "FAILED";
+
+export interface NewsletterIssue {
+  id: string;
+  status: ContentStatus;
+  title: string;
+  subtitle: string | null;
+  slug: string;
+  excerpt: string | null;
+  /** Omitted from list rows. */
+  content?: string;
+  coverImageId: string | null;
+  authorId: string;
+  publishedAt: string | null;
+  sendStatus: NewsletterSendStatus;
+  sendStartedAt: string | null;
+  sentAt: string | null;
+  recipientCount: number;
+  sentCount: number;
+  failedCount: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  noIndex: boolean;
+  createdAt: string;
+  updatedAt: string;
+  author: { id: string; name: string; avatarUrl: string | null };
+  coverImage: Media | null;
+}
+
+export interface NewsletterIssueLink {
+  title: string;
+  slug: string;
+  publishedAt: string | null;
+}
+
 // ───────────────────────────── aggregates ─────────────────────────────
 
 export interface HomePayload {
