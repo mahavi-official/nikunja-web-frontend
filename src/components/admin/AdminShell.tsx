@@ -19,6 +19,7 @@ import {
   Menu,
   MessageSquare,
   ScrollText,
+  Send,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -73,6 +74,12 @@ const NAV: NavGroup[] = [
         href: "/admin/posts",
         label: "Articles & blogs",
         Icon: FileText,
+        guard: (viewer) => canEditModule(viewer, "posts"),
+      },
+      {
+        href: "/admin/newsletter",
+        label: "Newsletter",
+        Icon: Send,
         guard: (viewer) => canEditModule(viewer, "posts"),
       },
       {

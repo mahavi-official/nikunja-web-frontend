@@ -9,6 +9,8 @@ import type {
   GallerySegment,
   HomePayload,
   Media,
+  NewsletterIssue,
+  NewsletterIssueLink,
   Page,
   AboutSections,
   PaginationMeta,
@@ -441,6 +443,33 @@ export async function lookupRedirect(path: string): Promise<UrlRedirect | null> 
     return null;
   }
 }
+
+// ═══════════════════════════ newsletter ═══════════════════════════
+
+export const listNewsletterIssues = cache(async (query: { page?: number; limit?: number; q?: string } = {}) => {
+  const limit = query.limit ?? 12;
+  const result = await tolerate(
+    getPage<{ issues: NewsletterIssue[] }>("/public/newsletter/issues", {
+      query: { ...query, limit },
+      revalidate: REVALIDATE.listing,
+      tags: ["newsletter"],
+    }),
+    emptyPage({ issues: [] as NewsletterIssue[] }, limit)
+  );
+  return { issues: result.data.issues ?? [], meta: result.meta };
+});
+
+export const getNewsletterIssue = cache(async (slug: string) =>
+  getData<{
+    issue: NewsletterIssue;
+    newer: NewsletterIssueLink | null;
+    older: NewsletterIssueLink | null;
+    seo: Seo;
+  }>(`/public/newsletter/issues/${encodeURIComponent(slug)}`, {
+    revalidate: REVALIDATE.detail,
+    tags: ["newsletter", `newsletter:${slug}`],
+  })
+);
 
 // ═══════════════════════════ writes ═══════════════════════════
 

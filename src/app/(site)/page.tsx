@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Hero, StaticHero } from "@/components/home/Hero";
 import { GalleryCard, PostCard, ResearchIndexRow, VideoCard } from "@/components/cards";
 import { ButtonLink, SectionHeading } from "@/components/ui/primitives";
-import { getHome, getSettings } from "@/lib/api";
+import { getHome, getSettings, listNewsletterIssues } from "@/lib/api";
+import { NewsletterForm } from "@/components/site/NewsletterForm";
+import { NEWSLETTER_NAME, NEWSLETTER_PITCH, issuePath } from "@/components/newsletter";
 import { buildPageMetadata, SITE_TAGLINE } from "@/lib/seo";
 import { formatDate, formatDateShort, isoDate } from "@/lib/format";
 
@@ -45,10 +47,11 @@ const CONTENTS = [
   { href: "/articles", name: "Articles", note: "Long-form writing on the place and its texts." },
   { href: "/gallery", name: "Gallery", note: "Photographs, gathered by season and observance." },
   { href: "/videos", name: "Videos", note: "Talks, kirtan, and recorded footage." },
+  { href: "/newsletter", name: "Newsletter", note: "Issues by email, and the archive of every one sent." },
 ];
 
 export default async function HomePage() {
-  const home = await getHome();
+  const [home, newsletter] = await Promise.all([getHome(), listNewsletterIssues({ limit: 3 })]);
   const hasContent =
     home.featuredResearch.length ||
     home.featuredPosts.length ||
@@ -85,7 +88,7 @@ export default async function HomePage() {
                     href={item.href}
                     className="group flex items-baseline gap-4 py-3 transition-colors hover:text-flame-700 dark:hover:text-flame-300"
                   >
-                    <span className="w-24 shrink-0 font-display text-lg">{item.name}</span>
+                    <span className="w-28 shrink-0 font-display text-lg">{item.name}</span>
                     <span className="text-sm text-ink-muted">{item.note}</span>
                   </Link>
                 </li>
@@ -236,6 +239,63 @@ export default async function HomePage() {
           </div>
         </section>
       ) : null}
+
+      {/* Newsletter: the signup on the left, the newest issues on the right —
+          what you would be signing up for, shown rather than described. */}
+      <section className="border-t border-line bg-surface-sunken py-16 md:py-20">
+        <div className="container-page grid gap-12 lg:grid-cols-12 lg:gap-14">
+          <div className={newsletter.issues.length ? "lg:col-span-5" : "lg:col-span-8"}>
+            <span className="eyebrow">Newsletter</span>
+            <h2 className="mt-1.5 text-3xl md:text-[2.5rem] md:leading-[1.1]">{NEWSLETTER_NAME}</h2>
+            <p className="mt-4 max-w-xl font-serif text-[1.0625rem] leading-relaxed text-ink-soft">
+              {NEWSLETTER_PITCH}
+            </p>
+            <div className="mt-6 max-w-md">
+              <NewsletterForm tone="default" buttonLabel="Subscribe" />
+            </div>
+            <p className="mt-3 text-xs text-ink-muted">
+              Free. Unsubscribe in one click.{" "}
+              <Link href="/newsletter" className="link-rule">
+                Read past issues
+              </Link>
+            </p>
+          </div>
+
+          {newsletter.issues.length ? (
+            <div className="lg:col-span-7">
+              <h3 className="eyebrow">Recent issues</h3>
+              <ul className="rule-list mt-4 border-t border-line-strong">
+                {newsletter.issues.map((issue) => (
+                  <li key={issue.id} className="group py-4">
+                    <div className="flex items-baseline gap-4">
+                      <time
+                        dateTime={isoDate(issue.publishedAt)}
+                        className="figure-margin w-20 shrink-0 text-[0.6875rem] tracking-[0.08em] uppercase"
+                      >
+                        {formatDateShort(issue.publishedAt)}
+                      </time>
+                      <div className="min-w-0">
+                        <Link
+                          href={issuePath(issue)}
+                          className="font-display text-lg leading-snug transition-colors group-hover:text-flame-700 dark:group-hover:text-flame-300"
+                        >
+                          {issue.title}
+                        </Link>
+                        {issue.subtitle || issue.excerpt ? (
+                          <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{issue.subtitle || issue.excerpt}</p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/newsletter" className="link-rule mt-5 inline-block text-sm text-ink-soft">
+                All issues
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </section>
 
       {/* A closing note, not a call to action. Two paragraphs of plain fact and
           the two links a reader actually needs, on the page's own ground. */}

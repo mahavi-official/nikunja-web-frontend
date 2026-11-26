@@ -3,7 +3,7 @@
 import { subscribeNewsletter } from "@/lib/api";
 import { cn } from "@/lib/format";
 import { Check, Loader2, Send } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 /**
  * Single opt-in. The backend rate-limits this to 3/hour per IP and stores an
@@ -11,9 +11,14 @@ import { useState } from "react";
  */
 export function NewsletterForm({
   tone = "inverse",
+  buttonLabel = "Subscribe For Newsletter",
 }: {
   tone?: "inverse" | "default";
+  buttonLabel?: string;
 }) {
+  // The form appears more than once on a page (footer + /newsletter), so the
+  // input id cannot be a constant.
+  const inputId = useId();
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">(
     "idle",
   );
@@ -66,18 +71,18 @@ export function NewsletterForm({
           inverse ? "text-white" : "text-ink",
         )}
       >
-        <label htmlFor="newsletter-email" className="sr-only">
+        <label htmlFor={inputId} className="sr-only">
           Email address
         </label>
         <input
-          id="newsletter-email"
+          id={inputId}
           type="email"
           name="email"
           required
           autoComplete="email"
           placeholder="you@example.com"
           className={cn(
-            "h-11 flex-1 rounded-full border px-5 text-[0.9375rem] outline-none transition-colors",
+            "h-11 w-full rounded-full sm:w-auto sm:flex-1 border px-5 text-[0.9375rem] outline-none transition-colors",
             inverse
               ? "border-white/20 bg-white/8 text-white placeholder:text-sand-300/70 focus:border-flame-400"
               : "border-line-strong bg-surface-raised placeholder:text-ink-muted focus:border-flame-400",
@@ -93,7 +98,7 @@ export function NewsletterForm({
           ) : (
             <Send className="size-4" aria-hidden />
           )}
-          Subscribe For Newsletter
+          {buttonLabel}
         </button>
       </div>
 
