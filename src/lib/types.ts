@@ -133,6 +133,20 @@ export interface PostAuthor {
   avatarUrl: string | null;
 }
 
+/** A byline chosen from the Authors directory (shared with research). */
+export interface PostByline {
+  postId: string;
+  authorId: string;
+  order: number;
+  author: {
+    id: string;
+    name: string;
+    slug: string;
+    affiliation: string | null;
+    photo: Media | null;
+  };
+}
+
 export interface Post {
   id: string;
   placement: Placement;
@@ -162,6 +176,8 @@ export interface Post {
   ogImage: Media | null;
   categories: { categoryId: string; postId: string; category: Category }[];
   tags: { tagId: string; postId: string; tag: Tag }[];
+  /** Chosen bylines, in order. Empty → credit `author`, the creating account. */
+  authors?: PostByline[];
 }
 
 /** Compact card shape used by the homepage rails. */
@@ -187,6 +203,17 @@ export interface Author {
   photo: Media | null;
   noIndex: boolean;
   research?: { research: Research }[];
+  /** Published articles and blogs credited to this author, newest first. */
+  posts?: {
+    post: {
+      id: string;
+      title: string;
+      slug: string;
+      placement: Placement;
+      excerpt: string | null;
+      publishedAt: string | null;
+    };
+  }[];
 }
 
 /** Public projection: metadata only, never a URL or an S3 key. */

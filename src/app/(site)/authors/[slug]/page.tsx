@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Building2, Mail } from "lucide-react";
 import { ApiError, getAuthor, listAuthors } from "@/lib/api";
-import { metadataFromSeo } from "@/lib/seo";
+import { metadataFromSeo, postPath } from "@/lib/seo";
 import { redirectOrNotFound } from "@/lib/navigation";
 import { formatDate, isoDate } from "@/lib/format";
 import { Breadcrumbs, EmptyState, JsonLd } from "@/components/ui/primitives";
@@ -41,6 +41,7 @@ export default async function AuthorPage({ params }: { params: Params }) {
   }
 
   const { author, seo } = data;
+  const writing = author.posts?.map((link) => link.post) ?? [];
   const publications =
     author.research?.map((link) => link.research).filter((item) => item.status === "PUBLISHED") ?? [];
 
@@ -143,6 +144,30 @@ export default async function AuthorPage({ params }: { params: Params }) {
           </div>
         )}
       </section>
+
+      {writing.length ? (
+        <section className="container-page pb-14">
+          <h2 className="text-xl">Articles &amp; writing</h2>
+          <ol className="mt-6 divide-y divide-[color:var(--border-subtle)]">
+            {writing.map((item) => (
+              <li key={item.id} className="group py-5">
+                <Link href={postPath(item)} className="block">
+                  <h3 className="text-lg leading-snug transition-colors group-hover:text-flame-600">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-sm text-ink-muted">
+                    <span>{item.placement === "BLOG" ? "Blog" : "Article"}</span>
+                    <time dateTime={isoDate(item.publishedAt)}>{formatDate(item.publishedAt)}</time>
+                  </p>
+                  {item.excerpt ? (
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-soft">{item.excerpt}</p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
     </>
   );
 }
