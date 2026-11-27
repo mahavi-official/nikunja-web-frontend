@@ -9,6 +9,7 @@ import { Engagement } from "@/components/post/Engagement";
 import { formatCount, formatDate, isoDate, normalizeMediaHtml, readingTime } from "@/lib/format";
 import { postPath } from "@/lib/seo";
 import type { Comment, Post, Seo } from "@/lib/types";
+import { postCredits, type Credit } from "@/lib/byline";
 
 /**
  * One renderer for both `/articles/{slug}` and `/blogs/{slug}` — the two routes
@@ -30,6 +31,7 @@ export function PostArticle({
   related: Post[];
   section: "articles" | "blogs";
 }) {
+  const credits = postCredits(post);
   const sectionLabel = section === "blogs" ? "Blog" : "Articles";
   const sectionPath = `/${section}`;
 
@@ -67,7 +69,9 @@ export function PostArticle({
               ) : null}
 
               <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
-                <span className="font-medium text-ink-soft">{post.author.name}</span>
+                <span className="font-medium text-ink-soft">
+                  <CreditNames credits={credits} />
+                </span>
                 <time dateTime={isoDate(post.publishedAt)}>{formatDate(post.publishedAt)}</time>
                 <span className="inline-flex items-center gap-1.5">
                   <Clock className="size-3.5" aria-hidden />
@@ -129,16 +133,38 @@ export function PostArticle({
               <ShareRow url={seo.canonical} title={post.title} />
             </div>
 
-            <aside className="mt-12 flex items-start gap-4 rounded-[var(--radius-card)] bg-surface-sunken p-6">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy-800 text-lg font-semibold text-white dark:bg-navy-600">
-                {post.author.name.charAt(0)}
-              </span>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold tracking-wider text-ink-muted uppercase">
-                  Written by
-                </p>
-                <p className="mt-1 font-serif text-lg font-semibold break-words">{post.author.name}</p>
-              </div>
+            <aside className="mt-12 rounded-[var(--radius-card)] bg-surface-sunken p-6">
+              <p className="text-xs font-semibold tracking-wider text-ink-muted uppercase">
+                Written by
+              </p>
+              <ul className="mt-3 space-y-4">
+                {credits.map((credit) => (
+                  <li key={credit.slug ?? credit.name} className="flex items-center gap-4">
+                    <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-800 text-lg font-semibold text-white dark:bg-navy-600">
+                      {credit.photo ? (
+                        <CoverImage media={credit.photo} alt="" size="thumb" sizes="48px" />
+                      ) : (
+                        credit.name.charAt(0)
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      {credit.slug ? (
+                        <Link
+                          href={`/authors/${credit.slug}`}
+                          className="font-serif text-lg font-semibold break-words transition-colors hover:text-flame-600"
+                        >
+                          {credit.name}
+                        </Link>
+                      ) : (
+                        <p className="font-serif text-lg font-semibold break-words">{credit.name}</p>
+                      )}
+                      {credit.affiliation ? (
+                        <p className="text-sm text-ink-muted">{credit.affiliation}</p>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </aside>
 
             <Engagement
@@ -175,6 +201,26 @@ export function PostArticle({
           </div>
         </section>
       ) : null}
+    </>
+  );
+}
+
+/** Names joined "A, B and C", each linked to its author page when it has one. */
+function CreditNames({ credits }: { credits: Credit[] }) {
+  return (
+    <>
+      {credits.map((credit, index) => (
+        <span key={credit.slug ?? credit.name}>
+          {index > 0 ? (index === credits.length - 1 ? " and " : ", ") : null}
+          {credit.slug ? (
+            <Link href={`/authors/${credit.slug}`} className="transition-colors hover:text-flame-600">
+              {credit.name}
+            </Link>
+          ) : (
+            credit.name
+          )}
+        </span>
+      ))}
     </>
   );
 }

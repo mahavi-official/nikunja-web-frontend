@@ -19,6 +19,7 @@ import {
   useToast,
 } from "./ui";
 import { ImageField } from "./MediaPicker";
+import { AuthorsPicker } from "./AuthorsPicker";
 import { RichTextEditor } from "./RichTextEditor";
 import { SeoPanel } from "./SeoPanel";
 import { useAsync } from "./useAsync";
@@ -44,6 +45,8 @@ export interface PostDraft {
   ogImage: Media | null;
   categoryIds: string[];
   tagNames: string[];
+  /** Ordered bylines from the Authors directory. */
+  authorIds: string[];
   publishedAt: string;
   isFeatured: boolean;
   commentsEnabled: boolean;
@@ -65,6 +68,7 @@ export function emptyDraft(): PostDraft {
     ogImage: null,
     categoryIds: [],
     tagNames: [],
+    authorIds: [],
     publishedAt: "",
     isFeatured: false,
     commentsEnabled: true,
@@ -87,6 +91,7 @@ export function draftFromPost(post: Post): PostDraft {
     ogImage: post.ogImage,
     categoryIds: post.categories?.map((link) => link.categoryId) ?? [],
     tagNames: post.tags?.map((link) => link.tag.name) ?? [],
+    authorIds: [...(post.authors ?? [])].sort((a, b) => a.order - b.order).map((link) => link.authorId),
     // `datetime-local` wants `YYYY-MM-DDTHH:mm` with no zone or seconds.
     publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "",
     isFeatured: post.isFeatured,
@@ -113,6 +118,7 @@ function toPayload(draft: PostDraft) {
     ogImageId: draft.ogImage?.id,
     categoryIds: draft.categoryIds,
     tagNames: draft.tagNames,
+    authorIds: draft.authorIds,
     publishedAt: draft.publishedAt ? new Date(draft.publishedAt).toISOString() : undefined,
     isFeatured: draft.isFeatured,
     commentsEnabled: draft.commentsEnabled,
@@ -390,6 +396,20 @@ export function PostForm({
                 </a>
               ) : null}
             </div>
+          </Panel>
+
+          <Panel
+            title="Authors"
+            description="Who the article is credited to, in this order."
+          >
+            <AuthorsPicker
+              value={draft.authorIds}
+              onChange={(next) => set("authorIds", next)}
+              emptyHint="None chosen: the article is credited to whoever created it."
+            />
+            {fieldErrors.authorIds ? (
+              <p className="mt-2 text-[0.8125rem] text-red-600">{fieldErrors.authorIds}</p>
+            ) : null}
           </Panel>
 
           <Panel title="Cover image">

@@ -8,6 +8,7 @@ import {
   truncate,
 } from "@/lib/format";
 import { postPath } from "@/lib/seo";
+import { joinNames, postCredits } from "@/lib/byline";
 import type {
   Author,
   GallerySegment,
@@ -151,8 +152,8 @@ export function PostCard({
           </p>
         ) : null}
 
-        {"author" in post && post.author ? (
-          <p className="mt-4 text-sm text-ink-muted">By {post.author.name}</p>
+        {"author" in post && postCredits(post).length ? (
+          <p className="mt-4 text-sm text-ink-muted">By {joinNames(postCredits(post).map((credit) => credit.name))}</p>
         ) : null}
       </article>
     );
@@ -202,8 +203,8 @@ export function PostCard({
         </p>
       ) : null}
 
-      {"author" in post && post.author ? (
-        <p className="mt-3 text-sm text-ink-muted">By {post.author.name}</p>
+      {"author" in post && postCredits(post).length ? (
+        <p className="mt-3 text-sm text-ink-muted">By {joinNames(postCredits(post).map((credit) => credit.name))}</p>
       ) : null}
     </article>
   );
